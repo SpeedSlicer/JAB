@@ -1,20 +1,21 @@
 package dev.speedslicer.main;
 
 import dev.speedslicer.game.registry.WeaponRegistry;
-import net.minestom.server.MinecraftServer;
-import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.Player;
-import net.minestom.server.event.GlobalEventHandler;
-import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
-import net.minestom.server.instance.InstanceContainer;
-import net.minestom.server.instance.InstanceManager;
-import net.minestom.server.instance.block.Block;
-import net.minestom.server.network.socket.Server;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class Main {
     public static ServerController instance;
-    public static void main(String[] args) {
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(WeaponRegistry.class);
+    public static void main(String[] args) throws IOException {
+        LOGGER.info("Beginning");
         ServerController instance = new ServerController();
     }
-
+    public static Logger getLogger() {
+        return LOGGER;
+    }
 }
