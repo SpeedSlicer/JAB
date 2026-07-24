@@ -1,10 +1,10 @@
-package dev.speedslicer.loader;
+package dev.speedslicer.server.bootstrap.data.weapons;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.speedslicer.api.weapon.WeaponData;
-import dev.speedslicer.main.Main;
-import dev.speedslicer.main.ServerController;
+import dev.speedslicer.server.main.Main;
+import dev.speedslicer.server.main.ServerController;
 
 import java.io.IOException;
 import java.nio.file.Files;

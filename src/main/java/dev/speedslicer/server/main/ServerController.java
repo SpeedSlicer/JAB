@@ -1,7 +1,7 @@
-package dev.speedslicer.main;
+package dev.speedslicer.server.main;
 
-import dev.speedslicer.game.registry.WeaponRegistry;
-import dev.speedslicer.loader.WeaponDataLoader;
+import dev.speedslicer.server.bootstrap.registry.WeaponRegistry;
+import dev.speedslicer.server.bootstrap.data.weapons.WeaponDataLoader;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Area;
 import net.minestom.server.coordinate.Pos;

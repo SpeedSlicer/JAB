@@ -1,6 +1,6 @@
-package dev.speedslicer.main;
+package dev.speedslicer.server.main;
 
-import dev.speedslicer.game.registry.WeaponRegistry;
+import dev.speedslicer.server.bootstrap.registry.WeaponRegistry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
