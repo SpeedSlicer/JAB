@@ -1,0 +1,26 @@
+{
+  "version": 0,
+  "id": "example",
+  "name": "example",
+  "description": [
+    "example"
+  ],
+  "weaponType": "SWORD",
+  "weaponClass": "WEAK",
+  "weaponWorld": "OVERWORLD",
+  "material": "minecraft:iron_sword",
+  "weaponStats": {
+    "damage": 0.0,
+    "healthBoost": 0.0,
+    "speed": 0.0,
+    "critChance": 0.0,
+    "luck": 0.0
+  },
+  "weaponDisplayOptions": {
+    "isEnchantGlint": false,
+    "floats": [],
+    "flags": [],
+    "strings": [],
+    "colors": []
+  }
+}

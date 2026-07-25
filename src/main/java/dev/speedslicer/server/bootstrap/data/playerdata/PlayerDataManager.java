@@ -3,7 +3,9 @@ package dev.speedslicer.server.bootstrap.data.playerdata;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
+import dev.speedslicer.api.APIVersion;
 import dev.speedslicer.api.player.PlayerData;
+import dev.speedslicer.server.ServerSettings;
 import dev.speedslicer.server.main.Main;
 
 import java.io.IOException;
@@ -71,7 +73,13 @@ public class PlayerDataManager {
 
                 return new PlayerData(playerId);
             }
-
+            if (data.getVersion() != APIVersion.playerDataVersion) {
+                Main.getLogger().warn("Loading non-similar version of weapon data for {}, update your JSON!", data.getVersion());
+                if (ServerSettings.safeMode) {
+                    Main.getLogger().error("Safe mode on! Aborting load");
+                    throw new RuntimeException();
+                }
+            }
             return data;
         } catch (IOException | JsonParseException exception) {
             Main.getLogger().error(

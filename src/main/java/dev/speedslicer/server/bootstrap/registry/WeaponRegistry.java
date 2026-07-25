@@ -1,6 +1,6 @@
 package dev.speedslicer.server.bootstrap.registry;
 
-import dev.speedslicer.api.weapon.WeaponData;
+import dev.speedslicer.api.weapon.data.WeaponData;
 import dev.speedslicer.server.main.Main;
 
 import java.util.Collection;

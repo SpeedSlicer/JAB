@@ -1,76 +1,84 @@
 package dev.speedslicer.api.player;
 
-import dev.speedslicer.api.weapon.WeaponData;
+import dev.speedslicer.api.APIVersion;
+import dev.speedslicer.api.weapon.data.WeaponData;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 public class PlayerData {
+    private final int version;
     private final UUID uuid;
-    private final List<String> weapons;
-    private final List<String> armors;
-    private final List<String> charms;
+    private final HashMap<String, Integer> weapons;
+    private final HashMap<String, Integer> armors;
+    private final HashMap<String, Integer> charms;
     private final int coins;
     private final long lvl;
-    private int selectedSlot;
+    private String selectedWeapon;
     private boolean completedTutorial;
 
     public PlayerData(UUID uuid) {
-        this(uuid, 0, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 0, 0, false);
+        this(uuid, 0, new HashMap<String, Integer> (), new HashMap<String, Integer> (), new HashMap<String, Integer> (), "basic_sword", 0, false);
     }
 
     public PlayerData(
             UUID uuid,
             int coins,
-            List<String> weapons,
-            List<String> armors,
-            List<String> charms,
-            int selectedSlot,
+            HashMap<String, Integer> weapons,
+            HashMap<String, Integer>  armors,
+            HashMap<String, Integer>  charms,
+            String selectedWeapon,
             long lvl,
             boolean completedTutorial
     ) {
+        this.version = APIVersion.playerDataVersion;
         this.uuid = uuid;
         this.coins = coins;
-        this.weapons = new ArrayList<>(weapons);
-        this.armors = new ArrayList<>(armors);
-        this.charms = new ArrayList<>(charms);
-
+        this.weapons = new HashMap<>(weapons);
+        this.armors = new HashMap<>(armors);
+        this.charms = new HashMap<>(charms);
+        this.selectedWeapon = selectedWeapon;
         this.lvl = lvl;
         this.completedTutorial = completedTutorial;
-        if (weapons.isEmpty()) {
-            this.selectedSlot = 0;
-        } else if (selectedSlot < 0 || selectedSlot >= weapons.size()) {
-            this.selectedSlot = 0;
-        } else {
-            this.selectedSlot = selectedSlot;
-        }
     }
 
+    public void addWeapon(String weaponData, int amount) {
+        if (weapons.get(weaponData) == null) {
+            weapons.put(weaponData, 1);
+        }
+        else {
+            weapons.put(weaponData, weapons.get(weaponData) + amount);
+
+        }
+    }
     public void addWeapon(String weaponData) {
-        weapons.add(weaponData);
+        addWeapon(weaponData, 1);
+    }
+
+    public void addWeapon(WeaponData weaponData, int amount) {
+        addWeapon(weaponData.id(), amount);
     }
 
     public void addWeapon(WeaponData weaponData) {
-        weapons.add(weaponData.id());
+        addWeapon(weaponData, 1);
     }
 
     public String getSelectedID() {
-        if (weapons.isEmpty()) {
+        if (weapons.get(selectedWeapon) == null) {
             return null;
         }
 
-        return weapons.get(selectedSlot);
+        return selectedWeapon;
     }
 
-    public void setWeapon(int selectedSlot) {
-        if (selectedSlot < 0 || selectedSlot >= weapons.size()) {
-            throw new IndexOutOfBoundsException(
-                    "Invalid weapon slot: " + selectedSlot
-            );
+    public void setWeapon(String selectedWeapon) {
+        if (weapons.get(selectedWeapon) == null) {
+            throw new IndexOutOfBoundsException();
         }
 
-        this.selectedSlot = selectedSlot;
+        this.selectedWeapon = selectedWeapon;
     }
 
     public UUID getUuid() {
@@ -85,12 +93,12 @@ public class PlayerData {
         return lvl;
     }
 
-    public int getSelectedSlot() {
-        return selectedSlot;
+    public String getSelectedWeapon() {
+        return selectedWeapon;
     }
 
     public List<String> getWeapons() {
-        return List.copyOf(weapons);
+        return List.copyOf(weapons.keySet());
     }
 
     public boolean hasCompletedTutorial() {
@@ -99,5 +107,9 @@ public class PlayerData {
 
     public void completeTutorial() {
         completedTutorial = true;
+    }
+
+    public int getVersion() {
+        return version;
     }
 }

@@ -2,7 +2,9 @@ package dev.speedslicer.server.bootstrap.data.weapons;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dev.speedslicer.api.weapon.WeaponData;
+import dev.speedslicer.api.APIVersion;
+import dev.speedslicer.api.weapon.data.WeaponData;
+import dev.speedslicer.server.ServerSettings;
 import dev.speedslicer.server.main.Main;
 import dev.speedslicer.server.main.ServerController;
 
@@ -26,7 +28,6 @@ public class WeaponDataLoader {
 
         Path folder = Path.of("data", "weapons");
         Files.createDirectories(folder);
-
         try (Stream<Path> paths = Files.walk(folder)) {
             paths.filter(Files::isRegularFile)
                     .filter(this::isJsonFile)
@@ -50,7 +51,13 @@ public class WeaponDataLoader {
         try {
             String json = Files.readString(path);
             WeaponData weaponData = gson.fromJson(json, WeaponData.class);
-
+            if (weaponData.version() != APIVersion.weaponDataVersion) {
+                Main.getLogger().warn("Loading non-similar version of weapon data for {}, update your JSON!", weaponData.id());
+                if (ServerSettings.safeMode) {
+                    Main.getLogger().error("Safe mode on! Aborting load");
+                    throw new RuntimeException();
+                }
+            }
             if (weaponData == null) {
                 Main.getLogger().warn("Weapon file produced null: {}", path);
                 return;

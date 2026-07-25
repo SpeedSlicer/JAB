@@ -1,5 +1,6 @@
 package dev.speedslicer.server.main;
 
+import dev.speedslicer.api.jsonExample.ExampleGenerator;
 import dev.speedslicer.server.bootstrap.registry.WeaponRegistry;
 
 import org.slf4j.Logger;
@@ -11,9 +12,13 @@ public class Main {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(WeaponRegistry.class);
     public static ServerController instance;
-
+    public static ExampleGenerator exampleGenerator;
     static void main(String[] args) throws IOException {
-        LOGGER.info("Beginning");
+        exampleGenerator = new ExampleGenerator();
+        LOGGER.info("START");
+        LOGGER.info("Generating Examples");
+        exampleGenerator.generateExamples();
+        LOGGER.info("Initializing Server");
         ServerController instance = new ServerController();
     }
 
