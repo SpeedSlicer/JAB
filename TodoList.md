@@ -1,3 +1,3 @@
-> Today
+> Next
 
-Give player a default Sword, create item stack constructor
+Begin the first enemy/enemy system
