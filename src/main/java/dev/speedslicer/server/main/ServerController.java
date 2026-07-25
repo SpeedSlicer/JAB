@@ -1,29 +1,39 @@
 package dev.speedslicer.server.main;
 
-import dev.speedslicer.api.player.PlayerData;
 import dev.speedslicer.server.bootstrap.data.playerdata.PlayerDataManager;
-import dev.speedslicer.server.bootstrap.registry.WeaponRegistry;
 import dev.speedslicer.server.bootstrap.data.weapons.WeaponDataLoader;
+import dev.speedslicer.server.bootstrap.registry.WeaponRegistry;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.advancements.FrameType;
+import net.minestom.server.advancements.Notification;
 import net.minestom.server.coordinate.Area;
+import net.minestom.server.coordinate.ChunkRange;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
-import net.minestom.server.event.player.PlayerPacketOutEvent;
+import net.minestom.server.event.player.PlayerSpawnEvent;
+import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
+import net.minestom.server.instance.LightingChunk;
 import net.minestom.server.instance.block.Block;
-import net.minestom.server.network.packet.server.common.DisconnectPacket;
+import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.Material;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 
 public class ServerController {
     WeaponDataLoader weaponDataLoader;
     WeaponRegistry weaponRegistry;
     InstanceContainer instanceContainer; // TODO replac with actual lobby system
     PlayerDataManager playerDataManager;
+
     public ServerController() throws IOException {
         weaponRegistry = new WeaponRegistry();
         weaponDataLoader = new WeaponDataLoader();
@@ -34,36 +44,69 @@ public class ServerController {
         SetupGlobalPackets();
         minecraftServer.start("0.0.0.0", 25565);
     }
-    public void SetupLobby(){
+
+    public void SetupLobby() {
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         instanceContainer = instanceManager.createInstanceContainer();
-        instanceContainer.setBlockArea(Area.cube(new Pos(0,30,0), 5), Block.STONE);
+
+        instanceContainer.setChunkSupplier(LightingChunk::new);
+
+        var chunks = new ArrayList<CompletableFuture<Chunk>>();
+
+        ChunkRange.chunksInRange(0, 0, 2, (x, z) ->
+                chunks.add(instanceContainer.loadChunk(x, z))
+        );
+
+        CompletableFuture.allOf(
+                chunks.toArray(CompletableFuture[]::new)
+        ).join();
+
+        instanceContainer.setBlockArea(
+                Area.cube(new Pos(0, 30, 0), 5),
+                Block.STONE
+        );
+
+        LightingChunk.relight(
+                instanceContainer,
+                instanceContainer.getChunks()
+        );
+
+        Main.getLogger().info("Lobby loaded and lighting calculated");
     }
+
     public void SetupGlobalPackets() {
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             final Player player = event.getPlayer();
+            Main.getLogger().info("Player " + player.getUsername() + " connected with UUID " + player.getUuid());
             event.setSpawningInstance(instanceContainer);
             player.setRespawnPoint(new Pos(0, 42, 0));
-            try {
-                playerDataManager.registerPlayer(player.getUuid());
-            } catch (IOException e) {
-                player.kick("Failed to get player data. Something broke!");
-                Main.getLogger().error(player.getUsername() + " attempted to log in without any data. Possbile bot?");
-                throw new RuntimeException(e);
+            playerDataManager.registerPlayer(player.getUuid());
+        });
+        globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
+            final Player player = event.getPlayer();
+            if (!playerDataManager.getPlayerData(player.getUuid()).hasCompletedTutorial()) { // TODO replace with an actual tutorial
+                Notification notification = new Notification(
+                        Component.text("Welcome to JAB!", NamedTextColor.GREEN),
+                        FrameType.GOAL,
+                        ItemStack.of(Material.GOLD_INGOT)
+                );
+                player.sendNotification(notification);
+                playerDataManager.getPlayerData(player.getUuid()).completeTutorial();
+                playerDataManager.getPlayerData(player.getUuid()).addWeapon("tutorial:basic_sword");
             }
+
         });
         globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> {
-           final Player player = event.getPlayer();
-           try {
-               playerDataManager.unregisterPlayer(player.getUuid());
-           }
-           catch (IOException e) {
-               Main.getLogger().error("Cannot save player " + player.getUsername() + "/" + player.getUuid() + " to server!");
-           }
+            final Player player = event.getPlayer();
+            Main.getLogger().info("Player {} disconnected with UUID {}", player.getUsername(), player.getUuid());
+            playerDataManager.unregisterPlayer(player.getUuid());
         });
     }
+
     public WeaponRegistry getWeaponRegistry() {
         return weaponRegistry;
     }
+
+
 }

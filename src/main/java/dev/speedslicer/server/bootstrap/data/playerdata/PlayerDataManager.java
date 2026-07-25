@@ -2,58 +2,116 @@ package dev.speedslicer.server.bootstrap.data.playerdata;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 import dev.speedslicer.api.player.PlayerData;
 import dev.speedslicer.server.main.Main;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerDataManager {
-    HashMap<UUID, PlayerData> activePlayerData;
-    Gson gson;
+
+    private static final Path PLAYER_DATA_FOLDER =
+            Path.of("data", "player");
+
+    private final ConcurrentHashMap<UUID, PlayerData> activePlayerData;
+    private final Gson gson;
+
     public PlayerDataManager() {
-        activePlayerData = new HashMap<>();
-        gson = new GsonBuilder().create();
+        activePlayerData = new ConcurrentHashMap<>();
+        gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .create();
     }
 
-    public void registerPlayer(UUID playerID) throws IOException {
-        Path folder = Path.of("data", "player");
-        Files.createDirectories(folder);
-        activePlayerData.put(playerID, getPlayerdata(playerID));
+    public void registerPlayer(UUID playerId) {
+        PlayerData playerData = loadPlayerData(playerId);
+        activePlayerData.put(playerId, playerData);
     }
 
-    public void unregisterPlayer(UUID playerID) throws IOException {
-        Path file = Path.of("data", "player", playerID.toString()+".json");
-        Files.write(file, gson.toJson(activePlayerData.get(playerID)).getBytes());
-        activePlayerData.remove(playerID);
-    }
+    public void unregisterPlayer(UUID playerId) {
+        PlayerData playerData = activePlayerData.remove(playerId);
 
-    PlayerData getPlayerdata(UUID playerID) {
-        Path file = Path.of("data", "player", playerID.toString()+".json");
-        PlayerData data = null;
-        if (Files.exists(file)) {
-            try {
-                data = gson.fromJson(Files.readString(file), PlayerData.class);
-            }
-            catch (IOException io) {
-                Main.getLogger().error(io.getLocalizedMessage());
-                io.printStackTrace();
-                Main.getLogger().error("PlayerData doesn't exist?");
-            }
+        if (playerData == null) {
+            Main.getLogger().warn(
+                    "Tried to save player {}, but they were not registered",
+                    playerId
+            );
+            return;
         }
-        else {
-            try {
-                Files.createFile(file);
-                data = new PlayerData(playerID);
-            }
-            catch (IOException io) {
-                Main.getLogger().error("Unable to create file");
-                io.printStackTrace();
-            }
+
+        savePlayerData(playerData);
+    }
+
+    private PlayerData loadPlayerData(UUID playerId) {
+        Path file = getPlayerFile(playerId);
+
+        if (Files.notExists(file)) {
+            Main.getLogger().info(
+                    "No player data found for {}, creating new data",
+                    playerId
+            );
+
+            return new PlayerData(playerId);
         }
-        return data;
+
+        try {
+            String json = Files.readString(file, StandardCharsets.UTF_8);
+            PlayerData data = gson.fromJson(json, PlayerData.class);
+
+            if (data == null) {
+                Main.getLogger().warn(
+                        "Player data file for {} was empty",
+                        playerId
+                );
+
+                return new PlayerData(playerId);
+            }
+
+            return data;
+        } catch (IOException | JsonParseException exception) {
+            Main.getLogger().error(
+                    "Could not load player data for {} from {}",
+                    playerId,
+                    file.toAbsolutePath(),
+                    exception
+            );
+
+            return new PlayerData(playerId);
+        }
+    }
+
+    private void savePlayerData(PlayerData playerData) {
+        Path file = getPlayerFile(playerData.getUuid());
+
+        try {
+            Files.createDirectories(PLAYER_DATA_FOLDER);
+
+            String json = gson.toJson(playerData);
+
+            Files.writeString(
+                    file,
+                    json,
+                    StandardCharsets.UTF_8
+            );
+        } catch (IOException exception) {
+            Main.getLogger().error(
+                    "Could not save player data for {}",
+                    playerData.getUuid(),
+                    exception
+            );
+        }
+    }
+
+    private Path getPlayerFile(UUID playerId) {
+        return PLAYER_DATA_FOLDER.resolve(playerId + ".json");
+    }
+
+    public PlayerData getPlayerData(UUID playerId) {
+        return activePlayerData.get(playerId);
     }
 }

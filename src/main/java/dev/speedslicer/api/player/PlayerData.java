@@ -8,14 +8,14 @@ import java.util.UUID;
 
 public class PlayerData {
     private final UUID uuid;
-
-    private int coins;
     private final List<String> weapons;
     private final List<String> armors;
     private final List<String> charms;
+    private final int coins;
+    private final long lvl;
     private int selectedSlot;
-    private long lvl;
     private boolean completedTutorial;
+
     public PlayerData(UUID uuid) {
         this(uuid, 0, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 0, 0, false);
     }

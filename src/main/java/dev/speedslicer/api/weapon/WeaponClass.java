@@ -7,9 +7,11 @@ public enum WeaponClass {
     IMPERFECT("wc_imperfect"),
     PERFECT("wc_perfect");
     final String id;
+
     WeaponClass(String id) {
         this.id = id;
     }
+
     public String getID() {
         return id;
     }

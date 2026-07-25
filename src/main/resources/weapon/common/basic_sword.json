@@ -1,5 +1,5 @@
 {
-  "id": "basic_sword",
+  "id": "tutorial:basic_sword",
   "name": "Basic Sword",
   "description": ["A trusty blade"],
   "weaponType": "SWORD",
