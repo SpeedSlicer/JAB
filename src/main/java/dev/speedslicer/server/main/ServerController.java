@@ -13,10 +13,18 @@ import net.minestom.server.advancements.Notification;
 import net.minestom.server.coordinate.Area;
 import net.minestom.server.coordinate.ChunkRange;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.EntityCreature;
+import net.minestom.server.entity.EntityType;
+import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.ai.goal.MeleeAttackGoal;
+import net.minestom.server.entity.ai.target.ClosestEntityTarget;
+import net.minestom.server.entity.damage.Damage;
+import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
@@ -31,7 +39,9 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class ServerController {
@@ -84,7 +94,25 @@ public class ServerController {
             player.getInventory().setItemStack(0, item);
             player.setHeldItemSlot((byte) 0);
         });
+        instanceContainer.eventNode().addListener(EntityAttackEvent.class, event -> {
+            if (event.getTarget() instanceof LivingEntity target) {
+                target.damage(Damage.fromEntity(event.getEntity(), 4));
+            }
+        });
+
         Main.getLogger().info("Lobby loaded and lighting calculated");
+
+        Pos spawnPosition = new Pos(0D, 42D, 0D);
+        EntityCreature horse = new EntityCreature(EntityType.HORSE);
+        // modify AI so that the horse is aggressive
+        horse.addAIGroup(List.of(
+                // adds a melee attack goal with the range of 4 and delay of 2 seconds
+                new MeleeAttackGoal(horse, 4.0, Duration.ofSeconds(2))
+        ), List.of(
+                // adds a target for closest entity that's a Player within 10 blocks
+                new ClosestEntityTarget(horse, 10.0, entity -> entity instanceof Player)
+        ));
+        horse.setInstance(instanceContainer, spawnPosition);
     }
 
     public void SetupGlobalPackets() {
