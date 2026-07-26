@@ -51,16 +51,18 @@ public class WeaponDataLoader {
         try {
             String json = Files.readString(path);
             WeaponData weaponData = gson.fromJson(json, WeaponData.class);
+
+            if (weaponData == null) {
+                Main.getLogger().warn("Weapon file produced null: {}", path);
+                return;
+            }
+
             if (weaponData.version() != APIVersion.weaponDataVersion) {
                 Main.getLogger().warn("Loading non-similar version of weapon data for {}, update your JSON!", weaponData.id());
                 if (ServerSettings.safeMode) {
                     Main.getLogger().error("Safe mode on! Aborting load");
                     throw new RuntimeException();
                 }
-            }
-            if (weaponData == null) {
-                Main.getLogger().warn("Weapon file produced null: {}", path);
-                return;
             }
 
             if (weaponData.id() == null || weaponData.id().isBlank()) {

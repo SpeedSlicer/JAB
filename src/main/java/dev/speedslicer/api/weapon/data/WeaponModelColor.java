@@ -1,32 +1,17 @@
 package dev.speedslicer.api.weapon.data;
 
-import net.kyori.adventure.util.RGBLike;
-import org.jetbrains.annotations.Range;
+import dev.speedslicer.api.item.data.ItemModelColor;
 
-public class WeaponModelColor implements RGBLike {
-    int red;
-    int blue;
-    int green;
+/**
+ * @deprecated Use {@link ItemModelColor}; model colors are not weapon-specific.
+ */
+@Deprecated
+public class WeaponModelColor extends ItemModelColor {
     public WeaponModelColor(int red, int blue, int green) {
-        this.red = red;
-        this.blue = blue;
-        this.green = green;
+        super(red, green, blue);
     }
+
     public static WeaponModelColor of(int red, int blue, int green) {
-        return new WeaponModelColor(red,  blue,  green);
-    }
-    @Override
-    public @Range(from = 0L, to = 255L) int red() {
-        return red;
-    }
-
-    @Override
-    public @Range(from = 0L, to = 255L) int green() {
-        return blue;
-    }
-
-    @Override
-    public @Range(from = 0L, to = 255L) int blue() {
-        return green;
+        return new WeaponModelColor(red, green, blue);
     }
 }
