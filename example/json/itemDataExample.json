@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "category": "registry",
+  "id": "example",
+  "name": "Example Thing",
+  "description": [
+    "Example thing"
+  ],
+  "material": "minecraft:iron_sword",
+  "maxStackSize": 1,
+  "displayOptions": {
+    "enchantGlint": true,
+    "floats": [],
+    "flags": [],
+    "strings": [],
+    "colors": []
+  },
+  "customData": {},
+  "itemBoosts": [
+    {
+      "boostType": "DAMAGE",
+      "amount": 2.1
+    }
+  ]
+}

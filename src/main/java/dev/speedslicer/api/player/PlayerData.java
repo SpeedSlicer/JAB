@@ -1,7 +1,7 @@
 package dev.speedslicer.api.player;
 
 import dev.speedslicer.api.APIVersion;
-import dev.speedslicer.api.weapon.data.WeaponData;
+import dev.speedslicer.api.item.data.ItemData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,12 +11,12 @@ import java.util.UUID;
 public class PlayerData {
     private final int version;
     private final UUID uuid;
-    private final HashMap<String, Integer> weapons;
+    private final HashMap<String, Integer> items;
     private final HashMap<String, Integer> armors;
     private final HashMap<String, Integer> charms;
     private final int coins;
     private final long lvl;
-    private String selectedWeapon;
+    private String selectedItem;
     private boolean completedTutorial;
 
     public PlayerData(UUID uuid) {
@@ -26,59 +26,59 @@ public class PlayerData {
     public PlayerData(
             UUID uuid,
             int coins,
-            HashMap<String, Integer> weapons,
+            HashMap<String, Integer> items,
             HashMap<String, Integer>  armors,
             HashMap<String, Integer>  charms,
-            String selectedWeapon,
+            String selectedItem,
             long lvl,
             boolean completedTutorial
     ) {
         this.version = APIVersion.playerDataVersion;
         this.uuid = uuid;
         this.coins = coins;
-        this.weapons = new HashMap<>(weapons);
+        this.items = new HashMap<>(items);
         this.armors = new HashMap<>(armors);
         this.charms = new HashMap<>(charms);
-        this.selectedWeapon = selectedWeapon;
+        this.selectedItem = selectedItem;
         this.lvl = lvl;
         this.completedTutorial = completedTutorial;
     }
 
-    public void addWeapon(String weaponData, int amount) {
-        if (weapons.get(weaponData) == null) {
-            weapons.put(weaponData, 1);
+    public void addItem(String itemData, int amount) {
+        if (items.get(itemData) == null) {
+            items.put(itemData, 1);
         }
         else {
-            weapons.put(weaponData, weapons.get(weaponData) + amount);
+            items.put(itemData, items.get(itemData) + amount);
 
         }
     }
-    public void addWeapon(String weaponData) {
-        addWeapon(weaponData, 1);
+    public void addItem(String itemData) {
+        addItem(itemData, 1);
     }
 
-    public void addWeapon(WeaponData weaponData, int amount) {
-        addWeapon(weaponData.id(), amount);
+    public void addItem(ItemData itemData, int amount) {
+        addItem(itemData.id(), amount);
     }
 
-    public void addWeapon(WeaponData weaponData) {
-        addWeapon(weaponData, 1);
+    public void addItem(ItemData itemData) {
+        addItem(itemData, 1);
     }
 
     public String getSelectedID() {
-        if (weapons.get(selectedWeapon) == null) {
+        if (items.get(selectedItem) == null) {
             return null;
         }
 
-        return selectedWeapon;
+        return selectedItem;
     }
 
-    public void setWeapon(String selectedWeapon) {
-        if (weapons.get(selectedWeapon) == null) {
+    public void setItem(String selectedItem) {
+        if (items.get(selectedItem) == null) {
             throw new IndexOutOfBoundsException();
         }
 
-        this.selectedWeapon = selectedWeapon;
+        this.selectedItem = selectedItem;
     }
 
     public UUID getUuid() {
@@ -93,12 +93,12 @@ public class PlayerData {
         return lvl;
     }
 
-    public String getSelectedWeapon() {
-        return selectedWeapon;
+    public String getSelectedItem() {
+        return selectedItem;
     }
 
-    public List<String> getWeapons() {
-        return List.copyOf(weapons.keySet());
+    public List<String> getItems() {
+        return List.copyOf(items.keySet());
     }
 
     public boolean hasCompletedTutorial() {

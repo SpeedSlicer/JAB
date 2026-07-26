@@ -7,11 +7,9 @@ import dev.speedslicer.server.bootstrap.data.entity.EntityAIDataLoader;
 import dev.speedslicer.server.bootstrap.data.entity.EntityDataLoader;
 import dev.speedslicer.server.bootstrap.data.items.ItemDataLoader;
 import dev.speedslicer.server.bootstrap.data.playerdata.PlayerDataManager;
-import dev.speedslicer.server.bootstrap.data.weapons.WeaponDataLoader;
 import dev.speedslicer.server.bootstrap.registry.EntityAIRegistry;
 import dev.speedslicer.server.bootstrap.registry.EntityRegistry;
 import dev.speedslicer.server.bootstrap.registry.ItemRegistry;
-import dev.speedslicer.server.bootstrap.registry.WeaponRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
@@ -21,23 +19,14 @@ import net.minestom.server.coordinate.Area;
 import net.minestom.server.coordinate.ChunkRange;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.EntityCreature;
-import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
-import net.minestom.server.entity.ai.EntityAI;
-import net.minestom.server.entity.ai.goal.MeleeAttackGoal;
-import net.minestom.server.entity.ai.target.ClosestEntityTarget;
 import net.minestom.server.entity.damage.Damage;
-import net.minestom.server.entity.damage.DamageType;
-import net.minestom.server.event.EventFilter;
-import net.minestom.server.event.EventNode;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
-import net.minestom.server.event.trait.InstanceEvent;
-import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
@@ -47,18 +36,15 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class ServerController {
-    WeaponDataLoader weaponDataLoader;
     ItemDataLoader itemDataLoader;
     EntityDataLoader entityDataLoader;
     EntityAIDataLoader entityAIDataLoader;
 
-    WeaponRegistry weaponRegistry;
+    ItemRegistry itemRegistry;
     EntityRegistry entityRegistry;
     EntityAIRegistry entityAIRegistry;
 
@@ -66,11 +52,10 @@ public class ServerController {
     PlayerDataManager playerDataManager;
 
     public ServerController() throws IOException {
-        weaponRegistry = new WeaponRegistry();
+        itemRegistry = new ItemRegistry();
         entityRegistry = new EntityRegistry();
         entityAIRegistry = new EntityAIRegistry();
 
-        weaponDataLoader = new WeaponDataLoader();
         itemDataLoader = new ItemDataLoader();
         entityDataLoader = new EntityDataLoader();
         entityAIDataLoader = new EntityAIDataLoader();
@@ -78,7 +63,6 @@ public class ServerController {
         playerDataManager = new PlayerDataManager();
 
         itemDataLoader.bootstrapLoad(this);
-        weaponDataLoader.bootstrapLoad(this);
         entityDataLoader.bootstrapLoad(this);
         entityAIDataLoader.bootstrapLoad(this);
         MinecraftServer minecraftServer = MinecraftServer.init();
@@ -116,9 +100,9 @@ public class ServerController {
             final Player player = event.getPlayer();
             PlayerData playerData = playerDataManager.getPlayerData(player.getUuid());
             player.getInventory().clear();
-            var item = ItemStackConstructor.constructItemFromData(
-                    weaponRegistry.get(playerData.getSelectedWeapon())
-            );
+    //        var item = ItemStackConstructor.constructItemFromData(
+      //             getItemRegistry().(playerData.getSelectedWeapon())
+        //    );
             player.getInventory().setItemStack(0, item);
             player.setHeldItemSlot((byte) 0);
         });
@@ -134,8 +118,8 @@ public class ServerController {
         EntityCreature john = EntityDataConstructor.generateEntityCreatureFromData(
                 entityRegistry.get("john"),
                 entityAIRegistry,
-                weaponRegistry
-        );
+                itemRegistry
+       );
         john.setInstance(instanceContainer, spawnPosition);
     }
 
@@ -159,7 +143,6 @@ public class ServerController {
                 );
                 player.sendNotification(notification);
                 playerDataManager.getPlayerData(player.getUuid()).completeTutorial();
-                playerDataManager.getPlayerData(player.getUuid()).addWeapon("tutorial:basic_sword");
             }
         });
         globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> {
@@ -169,12 +152,8 @@ public class ServerController {
         });
     }
 
-    public WeaponRegistry getWeaponRegistry() {
-        return weaponRegistry;
-    }
-
     public ItemRegistry getItemRegistry() {
-        return weaponRegistry;
+        return itemRegistry;
     }
 
     public EntityRegistry getEntityRegistry() {

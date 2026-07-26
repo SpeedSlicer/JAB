@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "category": "weapon",
+  "id": "basic_sword",
+  "name": "Basic Sword",
+  "description": [
+    "Quite a basic sword. Still, elegant tho"
+  ],
+  "material": "minecraft:stone_sword",
+  "maxStackSize": 1,
+  "displayOptions": {
+    "enchantGlint": false,
+    "floats": [],
+    "flags": [],
+    "strings": [],
+    "colors": []
+  },
+  "customData": {},
+  "itemBoosts": [
+    {
+      "boostType": "DAMAGE",
+      "amount": 1
+    }
+  ]
+}
