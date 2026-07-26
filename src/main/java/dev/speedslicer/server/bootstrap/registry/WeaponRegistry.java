@@ -8,5 +8,5 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class WeaponRegistry extends Registry<WeaponData> {
+public class WeaponRegistry extends Registry<WeaponData> {
 }

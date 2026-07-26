@@ -1,9 +1,14 @@
 package dev.speedslicer.server.main;
 
+import dev.speedslicer.api.entity.utils.EntityDataConstructor;
 import dev.speedslicer.api.player.PlayerData;
 import dev.speedslicer.api.weapon.utils.WeaponItemStackConstructor;
+import dev.speedslicer.server.bootstrap.data.entity.EntityAIDataLoader;
+import dev.speedslicer.server.bootstrap.data.entity.EntityDataLoader;
 import dev.speedslicer.server.bootstrap.data.playerdata.PlayerDataManager;
 import dev.speedslicer.server.bootstrap.data.weapons.WeaponDataLoader;
+import dev.speedslicer.server.bootstrap.registry.EntityAIRegistry;
+import dev.speedslicer.server.bootstrap.registry.EntityRegistry;
 import dev.speedslicer.server.bootstrap.registry.WeaponRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -17,6 +22,7 @@ import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.ai.EntityAI;
 import net.minestom.server.entity.ai.goal.MeleeAttackGoal;
 import net.minestom.server.entity.ai.target.ClosestEntityTarget;
 import net.minestom.server.entity.damage.Damage;
@@ -46,15 +52,30 @@ import java.util.concurrent.CompletableFuture;
 
 public class ServerController {
     WeaponDataLoader weaponDataLoader;
+    EntityDataLoader entityDataLoader;
+    EntityAIDataLoader entityAIDataLoader;
+
     WeaponRegistry weaponRegistry;
+    EntityRegistry entityRegistry;
+    EntityAIRegistry entityAIRegistry;
+
     InstanceContainer instanceContainer; // TODO replac with actual lobby system
     PlayerDataManager playerDataManager;
 
     public ServerController() throws IOException {
         weaponRegistry = new WeaponRegistry();
+        entityRegistry = new EntityRegistry();
+        entityAIRegistry = new EntityAIRegistry();
+
         weaponDataLoader = new WeaponDataLoader();
+        entityDataLoader = new EntityDataLoader();
+        entityAIDataLoader = new EntityAIDataLoader();
+
         playerDataManager = new PlayerDataManager();
+
         weaponDataLoader.bootstrapLoad(this);
+        entityDataLoader.bootstrapLoad(this);
+        entityAIDataLoader.bootstrapLoad(this);
         MinecraftServer minecraftServer = MinecraftServer.init();
         SetupLobby();
         SetupGlobalPackets();
@@ -103,16 +124,8 @@ public class ServerController {
         Main.getLogger().info("Lobby loaded and lighting calculated");
 
         Pos spawnPosition = new Pos(0D, 42D, 0D);
-        EntityCreature horse = new EntityCreature(EntityType.HORSE);
-        // modify AI so that the horse is aggressive
-        horse.addAIGroup(List.of(
-                // adds a melee attack goal with the range of 4 and delay of 2 seconds
-                new MeleeAttackGoal(horse, 4.0, Duration.ofSeconds(2))
-        ), List.of(
-                // adds a target for closest entity that's a Player within 10 blocks
-                new ClosestEntityTarget(horse, 10.0, entity -> entity instanceof Player)
-        ));
-        horse.setInstance(instanceContainer, spawnPosition);
+        EntityCreature john = EntityDataConstructor.generateEntityCreatureFromData(entityRegistry.get("john"), entityAIRegistry);
+        john.setInstance(instanceContainer, spawnPosition);
     }
 
     public void SetupGlobalPackets() {
@@ -148,6 +161,10 @@ public class ServerController {
     public WeaponRegistry getWeaponRegistry() {
         return weaponRegistry;
     }
-
-
+    public EntityRegistry getEntityRegistry() {
+        return entityRegistry;
+    }
+    public EntityAIRegistry getEntityAIRegistry() {
+        return entityAIRegistry;
+    }
 }

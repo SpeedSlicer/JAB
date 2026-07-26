@@ -1,4 +1,6 @@
 package dev.speedslicer.server.bootstrap.registry;
 
-public class EntityRegistry {
+import dev.speedslicer.api.entity.EntityData;
+
+public class EntityRegistry extends Registry<EntityData> {
 }
