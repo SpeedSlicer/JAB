@@ -5,10 +5,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import dev.speedslicer.api.entity.EntityData;
+import dev.speedslicer.api.entity.ai.EntityAIData;
+import dev.speedslicer.api.entity.items.EntityEquipmentData;
+import dev.speedslicer.api.item.data.ItemData;
+import dev.speedslicer.api.item.data.ItemDisplayOptions;
 import dev.speedslicer.api.player.PlayerData;
 import dev.speedslicer.api.weapon.data.*;
 import dev.speedslicer.server.main.Main;
-import net.minestom.server.coordinate.Pos;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -18,11 +21,28 @@ import java.util.*;
 
 public class ExampleGenerator {
     PlayerData playerDataExample;
+    ItemData itemDataExample;
     WeaponData weaponDataExample;
     EntityData entityDataExample;
     Gson gson;
     public ExampleGenerator() {
         playerDataExample = new PlayerData(UUID.randomUUID());
+        itemDataExample = new ItemData(
+                1,
+                "example:apple",
+                "Example Apple",
+                List.of("A generic registered item"),
+                "minecraft:apple",
+                16,
+                new ItemDisplayOptions(
+                        false,
+                        List.of(),
+                        List.of(),
+                        List.of(),
+                        List.of()
+                ),
+                Map.of()
+        );
         weaponDataExample = new WeaponData(
                 1,
                 "example",
@@ -37,12 +57,43 @@ public class ExampleGenerator {
         );
         Map<String, JsonElement> x = new HashMap<>();
         x.put("glowing", new JsonPrimitive(true));
-        entityDataExample = new EntityData(1, "john", "&6John", "minecraft:villager", List.of(), x);
+        x.put("customNameVisible", new JsonPrimitive(true));
+        entityDataExample = new EntityData(
+                1,
+                "john",
+                "&6John",
+                "minecraft:villager",
+                List.of(
+                        new EntityAIData(
+                                "aggressive_attack_player",
+                                Map.of(
+                                        "attackRange",
+                                        new JsonPrimitive(4.0),
+                                        "attackDelayMillis",
+                                        new JsonPrimitive(2_000),
+                                        "targetRange",
+                                        new JsonPrimitive(10.0)
+                                )
+                        )
+                ),
+                x,
+                new EntityEquipmentData(
+                        null,
+                        null,
+                        null,
+                        null,
+                        "tutorial:basic_sword",
+                        null,
+                        null,
+                        null
+                )
+        );
         gson = new GsonBuilder().setPrettyPrinting().create();
     }
     public void generateExamples() {
         try {
             generateExample(playerDataExample, "playerDataExample");
+            generateExample(itemDataExample, "itemDataExample");
             generateExample(weaponDataExample, "weaponDataExample");
             generateExample(entityDataExample, "entityDataExample");
 

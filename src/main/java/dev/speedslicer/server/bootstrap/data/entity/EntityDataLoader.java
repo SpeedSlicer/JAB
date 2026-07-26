@@ -51,6 +51,12 @@ public class EntityDataLoader {
         try {
             String json = Files.readString(path);
             EntityData entityData = gson.fromJson(json, EntityData.class);
+
+            if (entityData == null) {
+                Main.getLogger().warn("Entity file produced null: {}", path);
+                return;
+            }
+
             if (entityData.version() != APIVersion.entityDataVersion) {
                 Main.getLogger().warn("Loading non-similar version of entity data for {}, update your JSON!", entityData.id());
                 if (ServerSettings.safeMode) {
@@ -58,13 +64,9 @@ public class EntityDataLoader {
                     throw new RuntimeException();
                 }
             }
-            if (entityData == null) {
-                Main.getLogger().warn("entity file produced null: {}", path);
-                return;
-            }
 
             if (entityData.id() == null || entityData.id().isBlank()) {
-                Main.getLogger().warn("entity has no ID: {}", path);
+                Main.getLogger().warn("Entity has no ID: {}", path);
                 return;
             }
 

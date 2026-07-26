@@ -1,8 +1,22 @@
 package dev.speedslicer.api.weapon.data;
 
-import net.kyori.adventure.util.RGBLike;
+import dev.speedslicer.api.item.data.ItemDisplayOptions;
 
 import java.util.List;
 
-public record WeaponDisplayOptions (boolean isEnchantGlint, List<Float> floats, List<Boolean> flags, List<String> strings, List<WeaponModelColor> colors){
+/**
+ * @deprecated Use {@link ItemDisplayOptions}; display options are shared by all
+ * items.
+ */
+@Deprecated
+public class WeaponDisplayOptions extends ItemDisplayOptions {
+    public WeaponDisplayOptions(
+            boolean enchantGlint,
+            List<Float> floats,
+            List<Boolean> flags,
+            List<String> strings,
+            List<WeaponModelColor> colors
+    ) {
+        super(enchantGlint, floats, flags, strings, colors);
+    }
 }

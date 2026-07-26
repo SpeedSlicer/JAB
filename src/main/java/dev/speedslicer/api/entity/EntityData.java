@@ -1,7 +1,9 @@
 package dev.speedslicer.api.entity;
 
 import com.google.gson.JsonElement;
-import net.minestom.server.coordinate.Pos;
+import com.google.gson.annotations.SerializedName;
+import dev.speedslicer.api.entity.ai.EntityAIData;
+import dev.speedslicer.api.entity.items.EntityEquipmentData;
 
 import java.util.List;
 import java.util.Map;
@@ -11,7 +13,16 @@ public record EntityData(
         String id,
         String nametag,
         String baseEntity,
-        List<String> associatedAI,
-        Map<String, JsonElement> properties
+        @SerializedName(value = "associatedAI", alternate = "ai")
+        List<EntityAIData> associatedAI,
+        @SerializedName(value = "metadata", alternate = "properties")
+        Map<String, JsonElement> metadata,
+        EntityEquipmentData equipment
 ) {
+    public EntityData {
+        associatedAI = associatedAI == null
+                ? List.of()
+                : List.copyOf(associatedAI);
+        metadata = metadata == null ? Map.of() : Map.copyOf(metadata);
+    }
 }

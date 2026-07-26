@@ -16,6 +16,10 @@ dependencies {
     implementation("com.google.code.gson:gson:2.13.2")
     implementation("ch.qos.logback:logback-classic:1.5.18")
     implementation("org.xerial:sqlite-jdbc:3.53.2.0") // unneeded but for a future modification
+
+    testImplementation(platform("org.junit:junit-bom:5.12.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 application {
@@ -30,4 +34,8 @@ tasks.shadowJar {
 
 tasks.build {
     dependsOn(tasks.shadowJar)
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

@@ -3,8 +3,21 @@
   "id": "john",
   "nametag": "\u00266John",
   "baseEntity": "minecraft:villager",
-  "associatedAI": [],
-  "properties": {
-    "glowing": true
+  "associatedAI": [
+    {
+      "id": "aggressive_attack_player",
+      "data": {
+        "attackRange": 4.0,
+        "attackDelayMillis": 2000,
+        "targetRange": 10.0
+      }
+    }
+  ],
+  "metadata": {
+    "glowing": true,
+    "customNameVisible": true
+  },
+  "equipment": {
+    "mainHand": "tutorial:basic_sword"
   }
 }

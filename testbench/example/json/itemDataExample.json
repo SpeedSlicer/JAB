@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "id": "example:apple",
+  "name": "Example Apple",
+  "description": [
+    "A generic registered item"
+  ],
+  "material": "minecraft:apple",
+  "maxStackSize": 16,
+  "displayOptions": {
+    "enchantGlint": false,
+    "floats": [],
+    "flags": [],
+    "strings": [],
+    "colors": []
+  },
+  "customData": {}
+}

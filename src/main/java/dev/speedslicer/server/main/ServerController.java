@@ -1,14 +1,16 @@
 package dev.speedslicer.server.main;
 
 import dev.speedslicer.api.entity.utils.EntityDataConstructor;
+import dev.speedslicer.api.item.utils.ItemStackConstructor;
 import dev.speedslicer.api.player.PlayerData;
-import dev.speedslicer.api.weapon.utils.WeaponItemStackConstructor;
 import dev.speedslicer.server.bootstrap.data.entity.EntityAIDataLoader;
 import dev.speedslicer.server.bootstrap.data.entity.EntityDataLoader;
+import dev.speedslicer.server.bootstrap.data.items.ItemDataLoader;
 import dev.speedslicer.server.bootstrap.data.playerdata.PlayerDataManager;
 import dev.speedslicer.server.bootstrap.data.weapons.WeaponDataLoader;
 import dev.speedslicer.server.bootstrap.registry.EntityAIRegistry;
 import dev.speedslicer.server.bootstrap.registry.EntityRegistry;
+import dev.speedslicer.server.bootstrap.registry.ItemRegistry;
 import dev.speedslicer.server.bootstrap.registry.WeaponRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -52,6 +54,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class ServerController {
     WeaponDataLoader weaponDataLoader;
+    ItemDataLoader itemDataLoader;
     EntityDataLoader entityDataLoader;
     EntityAIDataLoader entityAIDataLoader;
 
@@ -68,11 +71,13 @@ public class ServerController {
         entityAIRegistry = new EntityAIRegistry();
 
         weaponDataLoader = new WeaponDataLoader();
+        itemDataLoader = new ItemDataLoader();
         entityDataLoader = new EntityDataLoader();
         entityAIDataLoader = new EntityAIDataLoader();
 
         playerDataManager = new PlayerDataManager();
 
+        itemDataLoader.bootstrapLoad(this);
         weaponDataLoader.bootstrapLoad(this);
         entityDataLoader.bootstrapLoad(this);
         entityAIDataLoader.bootstrapLoad(this);
@@ -111,7 +116,9 @@ public class ServerController {
             final Player player = event.getPlayer();
             PlayerData playerData = playerDataManager.getPlayerData(player.getUuid());
             player.getInventory().clear();
-            var item = WeaponItemStackConstructor.constructItemFromWeaponData(weaponRegistry.get(playerData.getSelectedWeapon()));
+            var item = ItemStackConstructor.constructItemFromData(
+                    weaponRegistry.get(playerData.getSelectedWeapon())
+            );
             player.getInventory().setItemStack(0, item);
             player.setHeldItemSlot((byte) 0);
         });
@@ -124,7 +131,11 @@ public class ServerController {
         Main.getLogger().info("Lobby loaded and lighting calculated");
 
         Pos spawnPosition = new Pos(0D, 42D, 0D);
-        EntityCreature john = EntityDataConstructor.generateEntityCreatureFromData(entityRegistry.get("john"), entityAIRegistry);
+        EntityCreature john = EntityDataConstructor.generateEntityCreatureFromData(
+                entityRegistry.get("john"),
+                entityAIRegistry,
+                weaponRegistry
+        );
         john.setInstance(instanceContainer, spawnPosition);
     }
 
@@ -161,6 +172,11 @@ public class ServerController {
     public WeaponRegistry getWeaponRegistry() {
         return weaponRegistry;
     }
+
+    public ItemRegistry getItemRegistry() {
+        return weaponRegistry;
+    }
+
     public EntityRegistry getEntityRegistry() {
         return entityRegistry;
     }
