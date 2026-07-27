@@ -14,3 +14,5 @@ Game Loop:
 - Give Chest Reward
 - Player Gets Stronger
 - Takes on stronger difficulty 
+
+Everything is data-driven, so have fun modfiying if you want to!
