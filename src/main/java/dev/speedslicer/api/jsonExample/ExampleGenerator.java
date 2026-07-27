@@ -3,6 +3,7 @@ package dev.speedslicer.api.jsonExample;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import dev.speedslicer.api.entity.EntityData;
 import dev.speedslicer.api.entity.ai.EntityAIData;
@@ -11,6 +12,8 @@ import dev.speedslicer.api.item.data.ItemData;
 import dev.speedslicer.api.item.data.ItemDisplayOptions;
 import dev.speedslicer.api.item.data.attribute.BoostType;
 import dev.speedslicer.api.item.data.attribute.ItemBoost;
+import dev.speedslicer.api.item.data.tag.ItemTagData;
+import dev.speedslicer.api.item.data.tag.ItemTagType;
 import dev.speedslicer.api.player.PlayerData;
 import dev.speedslicer.server.main.Main;
 
@@ -61,16 +64,52 @@ public class ExampleGenerator {
                 )
         );
         itemDataExample = new ItemData(
-                2,
+                3,
                 "example",
                 "registry",
                 "Example Thing",
                 List.of("Example thing"),
                 "minecraft:iron_sword",
                 1,
+                1,
                 new ItemDisplayOptions(true, List.of(), List.of(), List.of(), List.of()),
                 new HashMap<>(),
-                List.of(new ItemBoost(BoostType.DAMAGE, 2.1)));
+                List.of(new ItemBoost(BoostType.DAMAGE, 2.1)),
+                Map.of(
+                        "minecraft:rarity", new JsonPrimitive("rare"),
+                        "minecraft:repair_cost", new JsonPrimitive(0),
+                        "minecraft:unbreakable", new JsonPrimitive(true)
+                ),
+                List.of(),
+                List.of(),
+                Map.of(
+                        "jab:item_id", new ItemTagData(
+                                ItemTagType.STRING,
+                                new JsonPrimitive("registry:example"),
+                                false,
+                                List.of()
+                        ),
+                        "jab:level", new ItemTagData(
+                                ItemTagType.INTEGER,
+                                new JsonPrimitive(1),
+                                false,
+                                List.of()
+                        ),
+                        "jab:labels", new ItemTagData(
+                                ItemTagType.STRING,
+                                JsonParser.parseString("[\"example\", \"generated\"]"),
+                                true,
+                                List.of()
+                        ),
+                        "payload", new ItemTagData(
+                                ItemTagType.NBT,
+                                JsonParser.parseString(
+                                        "{\"enabled\": true, \"source\": \"example\"}"
+                                ),
+                                false,
+                                List.of("jab")
+                        )
+                ));
         gson = new GsonBuilder().setPrettyPrinting().create();
     }
     public void generateExamples() {

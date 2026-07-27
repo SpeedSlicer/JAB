@@ -35,7 +35,7 @@ public final class ItemStackConstructor {
         }
 
         ItemStack item = ItemStack.of(material)
-                .withAmount(1)
+                .withAmount(itemData.amount())
                 .withMaxStackSize(itemData.maxStackSize());
 
         if (itemData.name() != null && !itemData.name().isBlank()) {
@@ -70,7 +70,7 @@ public final class ItemStackConstructor {
             );
         }
 
-        return item;
+        return ItemStackConfigurationApplier.apply(item, itemData);
     }
 
     private static List<Component> createDescription(

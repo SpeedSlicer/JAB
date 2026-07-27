@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "category": "registry",
   "id": "example",
   "name": "Example Thing",
@@ -7,6 +7,7 @@
     "Example thing"
   ],
   "material": "minecraft:iron_sword",
+  "amount": 1,
   "maxStackSize": 1,
   "displayOptions": {
     "enchantGlint": true,
@@ -21,5 +22,46 @@
       "boostType": "DAMAGE",
       "amount": 2.1
     }
-  ]
+  ],
+  "components": {
+    "minecraft:repair_cost": 0,
+    "minecraft:rarity": "rare",
+    "minecraft:unbreakable": true
+  },
+  "resetComponents": [],
+  "removeComponents": [],
+  "tags": {
+    "jab:labels": {
+      "type": "STRING",
+      "value": [
+        "example",
+        "generated"
+      ],
+      "list": true,
+      "path": []
+    },
+    "jab:level": {
+      "type": "INTEGER",
+      "value": 1,
+      "list": false,
+      "path": []
+    },
+    "jab:item_id": {
+      "type": "STRING",
+      "value": "registry:example",
+      "list": false,
+      "path": []
+    },
+    "payload": {
+      "type": "NBT",
+      "value": {
+        "enabled": true,
+        "source": "example"
+      },
+      "list": false,
+      "path": [
+        "jab"
+      ]
+    }
+  }
 }

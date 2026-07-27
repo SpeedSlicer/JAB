@@ -7,15 +7,15 @@
     {
       "id": "aggressive_attack_player",
       "data": {
-        "targetRange": 10.0,
         "attackDelayMillis": 2000,
-        "attackRange": 4.0
+        "attackRange": 4.0,
+        "targetRange": 10.0
       }
     }
   ],
   "metadata": {
-    "glowing": true,
-    "customNameVisible": true
+    "customNameVisible": true,
+    "glowing": true
   },
   "equipment": {
     "mainHand": "weapon:basic_sword"

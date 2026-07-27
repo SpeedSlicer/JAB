@@ -3,6 +3,7 @@ package dev.speedslicer.server.main;
 import dev.speedslicer.api.entity.utils.EntityDataConstructor;
 import dev.speedslicer.api.item.utils.ItemStackConstructor;
 import dev.speedslicer.api.player.PlayerData;
+import dev.speedslicer.api.player.PlayerSlot;
 import dev.speedslicer.server.bootstrap.data.entity.EntityAIDataLoader;
 import dev.speedslicer.server.bootstrap.data.entity.EntityDataLoader;
 import dev.speedslicer.server.bootstrap.data.items.ItemDataLoader;
@@ -24,6 +25,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.entity.EntityAttackEvent;
+import net.minestom.server.event.item.ItemDropEvent;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
@@ -100,11 +102,14 @@ public class ServerController {
             final Player player = event.getPlayer();
             PlayerData playerData = playerDataManager.getPlayerData(player.getUuid());
             player.getInventory().clear();
-    //        var item = ItemStackConstructor.constructItemFromData(
-      //             getItemRegistry().(playerData.getSelectedWeapon())
-        //    );
+
+            var item = ItemStackConstructor.constructItemFromData(
+                  getItemRegistry().getItem(playerData.getHandItem()));
             player.getInventory().setItemStack(0, item);
             player.setHeldItemSlot((byte) 0);
+        });
+        instanceContainer.eventNode().addListener(ItemDropEvent.class, event -> {
+            event.setCancelled(true);
         });
         instanceContainer.eventNode().addListener(EntityAttackEvent.class, event -> {
             if (event.getTarget() instanceof LivingEntity target) {
@@ -135,14 +140,19 @@ public class ServerController {
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
             final Player player = event.getPlayer();
             // TODO Replace this block
-            if (!playerDataManager.getPlayerData(player.getUuid()).hasCompletedTutorial()) { // TODO replace with an actual tutorial
+            PlayerData data = playerDataManager.getPlayerData(player.getUuid());
+            if (!data.hasCompletedTutorial()) { // TODO replace with an actual tutorial
                 Notification notification = new Notification(
                         Component.text("Welcome to JAB!", NamedTextColor.GREEN),
                         FrameType.GOAL,
                         ItemStack.of(Material.GOLD_INGOT)
                 );
+
+                data.addItem("weapon:basic_sword");
+                data.setSlot(PlayerSlot.HAND, "weapon:basic_sword");
+
                 player.sendNotification(notification);
-                playerDataManager.getPlayerData(player.getUuid()).completeTutorial();
+                data.completeTutorial();
             }
         });
         globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> {
@@ -150,6 +160,7 @@ public class ServerController {
             Main.getLogger().info("Player {} disconnected with UUID {}", player.getUsername(), player.getUuid());
             playerDataManager.unregisterPlayer(player.getUuid());
         });
+
     }
 
     public ItemRegistry getItemRegistry() {

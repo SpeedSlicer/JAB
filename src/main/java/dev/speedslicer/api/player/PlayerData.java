@@ -3,10 +3,7 @@ package dev.speedslicer.api.player;
 import dev.speedslicer.api.APIVersion;
 import dev.speedslicer.api.item.data.ItemData;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerData {
     private final int version;
@@ -16,11 +13,11 @@ public class PlayerData {
     private final HashMap<String, Integer> charms;
     private final int coins;
     private final long lvl;
-    private String selectedItem;
+    private Map<PlayerSlot, String> selectedItems;
     private boolean completedTutorial;
 
     public PlayerData(UUID uuid) {
-        this(uuid, 0, new HashMap<String, Integer> (), new HashMap<String, Integer> (), new HashMap<String, Integer> (), "basic_sword", 0, false);
+        this(uuid, 0, new HashMap<String, Integer> (), new HashMap<String, Integer> (), new HashMap<String, Integer> (), new HashMap<>(), 0, false);
     }
 
     public PlayerData(
@@ -29,7 +26,7 @@ public class PlayerData {
             HashMap<String, Integer> items,
             HashMap<String, Integer>  armors,
             HashMap<String, Integer>  charms,
-            String selectedItem,
+            Map<PlayerSlot, String>  selectedItems,
             long lvl,
             boolean completedTutorial
     ) {
@@ -39,7 +36,7 @@ public class PlayerData {
         this.items = new HashMap<>(items);
         this.armors = new HashMap<>(armors);
         this.charms = new HashMap<>(charms);
-        this.selectedItem = selectedItem;
+        this.selectedItems = selectedItems;
         this.lvl = lvl;
         this.completedTutorial = completedTutorial;
     }
@@ -65,20 +62,15 @@ public class PlayerData {
         addItem(itemData, 1);
     }
 
-    public String getSelectedID() {
-        if (items.get(selectedItem) == null) {
-            return null;
-        }
-
-        return selectedItem;
+    public String getHandItem() {
+        return selectedItems.get(PlayerSlot.HAND);
     }
 
-    public void setItem(String selectedItem) {
+    public void setSlot(PlayerSlot slot, String selectedItem) {
         if (items.get(selectedItem) == null) {
             throw new IndexOutOfBoundsException();
         }
-
-        this.selectedItem = selectedItem;
+        selectedItems.put(slot, selectedItem);
     }
 
     public UUID getUuid() {
@@ -91,10 +83,6 @@ public class PlayerData {
 
     public long getLvl() {
         return lvl;
-    }
-
-    public String getSelectedItem() {
-        return selectedItem;
     }
 
     public List<String> getItems() {
