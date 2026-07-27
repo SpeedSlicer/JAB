@@ -12,8 +12,6 @@ public class ItemDisplayOptions {
     private List<String> strings;
     private List<ItemModelColor> colors;
 
-    protected ItemDisplayOptions() {
-    }
 
     public ItemDisplayOptions(
             boolean enchantGlint,

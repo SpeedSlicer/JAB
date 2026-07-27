@@ -1,0 +1,44 @@
+{
+  "version": 3,
+  "category": "weapon",
+  "id": "basic_sword",
+  "name": "Basic Sword",
+  "description": [
+    "Quite a basic sword. Still, elegant tho"
+  ],
+  "material": "minecraft:stone_sword",
+  "amount": 1,
+  "maxStackSize": 1,
+  "displayOptions": {
+    "enchantGlint": false,
+    "floats": [],
+    "flags": [],
+    "strings": [],
+    "colors": []
+  },
+  "customData": {},
+  "itemBoosts": [
+    {
+      "boostType": "DAMAGE",
+      "amount": 1
+    }
+  ],
+  "components": {
+    "minecraft:tooltip_display": {
+      "hide_tooltip": false,
+      "hidden_components": [
+        "minecraft:attribute_modifiers"
+      ]
+    }
+  },
+  "resetComponents": [],
+  "removeComponents": [],
+  "tags": {
+    "jab:item_id": {
+      "type": "STRING",
+      "value": "weapon:basic_sword",
+      "list": false,
+      "path": []
+    }
+  }
+}

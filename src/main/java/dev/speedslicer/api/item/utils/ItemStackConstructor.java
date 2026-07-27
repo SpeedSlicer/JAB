@@ -2,8 +2,9 @@ package dev.speedslicer.api.item.utils;
 
 import dev.speedslicer.api.item.data.ItemData;
 import dev.speedslicer.api.item.data.ItemDisplayOptions;
-import dev.speedslicer.api.weapon.data.WeaponData;
-import dev.speedslicer.api.weapon.utils.WeaponItemStackConstructor;
+import dev.speedslicer.api.item.data.attribute.BoostType;
+import dev.speedslicer.api.item.data.attribute.ItemBoost;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -12,6 +13,7 @@ import net.minestom.server.item.Material;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public final class ItemStackConstructor {
 
@@ -19,12 +21,6 @@ public final class ItemStackConstructor {
     }
 
     public static ItemStack constructItemFromData(ItemData itemData) {
-        if (itemData instanceof WeaponData weaponData) {
-            return WeaponItemStackConstructor.constructItemFromWeaponData(
-                    weaponData
-            );
-        }
-
         if (itemData == null) {
             throw new IllegalArgumentException("itemData cannot be null");
         }
@@ -39,7 +35,7 @@ public final class ItemStackConstructor {
         }
 
         ItemStack item = ItemStack.of(material)
-                .withAmount(1)
+                .withAmount(itemData.amount())
                 .withMaxStackSize(itemData.maxStackSize());
 
         if (itemData.name() != null && !itemData.name().isBlank()) {
@@ -50,6 +46,7 @@ public final class ItemStackConstructor {
         }
 
         List<Component> lore = createDescription(itemData.description());
+        addItemBoosts(lore, itemData.getItemBoosts());
 
         if (!lore.isEmpty()) {
             item = item.withLore(lore);
@@ -73,7 +70,7 @@ public final class ItemStackConstructor {
             );
         }
 
-        return item;
+        return ItemStackConfigurationApplier.apply(item, itemData);
     }
 
     private static List<Component> createDescription(
@@ -93,5 +90,99 @@ public final class ItemStackConstructor {
         }
 
         return lore;
+    }
+
+    private static void addItemBoosts(
+            List<Component> lore,
+            List<ItemBoost> itemBoosts
+    ) {
+        if (itemBoosts == null || itemBoosts.isEmpty()) {
+            return;
+        }
+
+        List<ItemBoost> validBoosts = itemBoosts.stream()
+                .filter(boost ->
+                        boost != null && boost.boostType() != null
+                )
+                .toList();
+
+        if (validBoosts.isEmpty()) {
+            return;
+        }
+
+        if (!lore.isEmpty()) {
+            lore.add(Component.empty());
+        }
+
+        lore.add(
+                Component.text("Item Attributes", NamedTextColor.YELLOW)
+                        .decorate(TextDecoration.BOLD)
+                        .decoration(TextDecoration.ITALIC, false)
+        );
+
+        for (ItemBoost itemBoost : validBoosts) {
+            BoostType boostType = itemBoost.boostType();
+
+            lore.add(
+                    Component.text(
+                                    "  " + prettify(boostType.name()) + ": ",
+                                    NamedTextColor.DARK_GRAY
+                            )
+                            .append(
+                                    Component.text(
+                                            formatSigned(itemBoost.amount()),
+                                            boostColor(boostType)
+                                    )
+                            )
+                            .decoration(TextDecoration.ITALIC, false)
+            );
+        }
+    }
+
+    private static NamedTextColor boostColor(BoostType boostType) {
+        return switch (boostType) {
+            case DAMAGE -> NamedTextColor.RED;
+            case HEALTH -> NamedTextColor.GREEN;
+        };
+    }
+
+    private static String formatSigned(double value) {
+        if (value > 0) {
+            return "+" + formatNumber(value);
+        }
+
+        return formatNumber(value);
+    }
+
+    private static String formatNumber(double value) {
+        if (value == Math.rint(value)) {
+            return Long.toString((long) value);
+        }
+
+        return String.format(Locale.US, "%.2f", value)
+                .replaceAll("0+$", "")
+                .replaceAll("\\.$", "");
+    }
+
+    private static String prettify(String enumName) {
+        String[] words = enumName
+                .toLowerCase(Locale.US)
+                .split("_");
+        StringBuilder result = new StringBuilder();
+
+        for (String word : words) {
+            if (word.isEmpty()) {
+                continue;
+            }
+
+            if (!result.isEmpty()) {
+                result.append(' ');
+            }
+
+            result.append(Character.toUpperCase(word.charAt(0)))
+                    .append(word.substring(1));
+        }
+
+        return result.toString();
     }
 }

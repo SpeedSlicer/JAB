@@ -3,14 +3,18 @@ package dev.speedslicer.api.jsonExample;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import dev.speedslicer.api.entity.EntityData;
 import dev.speedslicer.api.entity.ai.EntityAIData;
 import dev.speedslicer.api.entity.items.EntityEquipmentData;
 import dev.speedslicer.api.item.data.ItemData;
 import dev.speedslicer.api.item.data.ItemDisplayOptions;
+import dev.speedslicer.api.item.data.attribute.BoostType;
+import dev.speedslicer.api.item.data.attribute.ItemBoost;
+import dev.speedslicer.api.item.data.tag.ItemTagData;
+import dev.speedslicer.api.item.data.tag.ItemTagType;
 import dev.speedslicer.api.player.PlayerData;
-import dev.speedslicer.api.weapon.data.*;
 import dev.speedslicer.server.main.Main;
 
 import java.io.IOException;
@@ -22,39 +26,10 @@ import java.util.*;
 public class ExampleGenerator {
     PlayerData playerDataExample;
     ItemData itemDataExample;
-    WeaponData weaponDataExample;
     EntityData entityDataExample;
     Gson gson;
     public ExampleGenerator() {
         playerDataExample = new PlayerData(UUID.randomUUID());
-        itemDataExample = new ItemData(
-                1,
-                "example:apple",
-                "Example Apple",
-                List.of("A generic registered item"),
-                "minecraft:apple",
-                16,
-                new ItemDisplayOptions(
-                        false,
-                        List.of(),
-                        List.of(),
-                        List.of(),
-                        List.of()
-                ),
-                Map.of()
-        );
-        weaponDataExample = new WeaponData(
-                1,
-                "example",
-                "example",
-                List.of("example"),
-                WeaponType.SWORD,
-                WeaponClass.WEAK,
-                WeaponWorld.OVERWORLD,
-                "minecraft:iron_sword",
-                new WeaponStats(0,0d,0d,0d, 0d),
-                new WeaponDisplayOptions(false, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>())
-        );
         Map<String, JsonElement> x = new HashMap<>();
         x.put("glowing", new JsonPrimitive(true));
         x.put("customNameVisible", new JsonPrimitive(true));
@@ -82,19 +57,65 @@ public class ExampleGenerator {
                         null,
                         null,
                         null,
-                        "tutorial:basic_sword",
+                        "weapon:basic_sword",
                         null,
                         null,
                         null
                 )
         );
+        itemDataExample = new ItemData(
+                3,
+                "example",
+                "registry",
+                "Example Thing",
+                List.of("Example thing"),
+                "minecraft:iron_sword",
+                1,
+                1,
+                new ItemDisplayOptions(true, List.of(), List.of(), List.of(), List.of()),
+                new HashMap<>(),
+                List.of(new ItemBoost(BoostType.DAMAGE, 2.1)),
+                Map.of(
+                        "minecraft:rarity", new JsonPrimitive("rare"),
+                        "minecraft:repair_cost", new JsonPrimitive(0),
+                        "minecraft:unbreakable", new JsonPrimitive(true)
+                ),
+                List.of(),
+                List.of(),
+                Map.of(
+                        "jab:item_id", new ItemTagData(
+                                ItemTagType.STRING,
+                                new JsonPrimitive("registry:example"),
+                                false,
+                                List.of()
+                        ),
+                        "jab:level", new ItemTagData(
+                                ItemTagType.INTEGER,
+                                new JsonPrimitive(1),
+                                false,
+                                List.of()
+                        ),
+                        "jab:labels", new ItemTagData(
+                                ItemTagType.STRING,
+                                JsonParser.parseString("[\"example\", \"generated\"]"),
+                                true,
+                                List.of()
+                        ),
+                        "payload", new ItemTagData(
+                                ItemTagType.NBT,
+                                JsonParser.parseString(
+                                        "{\"enabled\": true, \"source\": \"example\"}"
+                                ),
+                                false,
+                                List.of("jab")
+                        )
+                ));
         gson = new GsonBuilder().setPrettyPrinting().create();
     }
     public void generateExamples() {
         try {
             generateExample(playerDataExample, "playerDataExample");
             generateExample(itemDataExample, "itemDataExample");
-            generateExample(weaponDataExample, "weaponDataExample");
             generateExample(entityDataExample, "entityDataExample");
 
         }

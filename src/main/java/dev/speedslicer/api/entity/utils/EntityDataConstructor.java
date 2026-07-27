@@ -125,7 +125,7 @@ public final class EntityDataConstructor {
                 continue;
             }
 
-            ItemData itemData = itemRegistry.get(itemId);
+            ItemData itemData = itemRegistry.getItem(itemId);
 
             if (itemData == null) {
                 throw new IllegalArgumentException(
