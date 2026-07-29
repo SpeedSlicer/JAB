@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import dev.speedslicer.api.entity.ai.TemplateEntityAI;
 import dev.speedslicer.server.main.ServerController;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.ai.goal.FollowTargetGoal;
 import net.minestom.server.entity.ai.goal.MeleeAttackGoal;
 import net.minestom.server.entity.ai.target.ClosestEntityTarget;
 
@@ -14,7 +15,7 @@ import java.util.Map;
 public class EntityAIDataLoader {
     public void bootstrapLoad(ServerController serverController) {
         var reg = serverController.getEntityAIRegistry();
-        reg.register("aggressive_attack_player",
+        reg.register("chase_attack_player",
                 new TemplateEntityAI(
                         (entity, data) ->
                                 List.of(
@@ -32,6 +33,10 @@ public class EntityAIDataLoader {
                                                                 2_000
                                                         )
                                                 )
+                                        ),
+                                        new FollowTargetGoal(
+                                                entity,
+                                                Duration.MAX
                                         )
                                 ),
                         (entity, data) ->

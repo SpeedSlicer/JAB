@@ -5,11 +5,11 @@
   "baseEntity": "minecraft:villager",
   "associatedAI": [
     {
-      "id": "aggressive_attack_player",
+      "id": "chase_attack_player",
       "data": {
-        "attackRange": 4.0,
+        "attackRange": 1.0,
         "attackDelayMillis": 2000,
-        "targetRange": 10.0
+        "targetRange": 15.0
       }
     }
   ],
