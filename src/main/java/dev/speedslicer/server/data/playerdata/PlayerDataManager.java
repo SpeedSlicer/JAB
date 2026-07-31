@@ -1,4 +1,4 @@
-package dev.speedslicer.server.bootstrap.data.playerdata;
+package dev.speedslicer.server.data.playerdata;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -20,7 +20,8 @@ public class PlayerDataManager {
     private static final Path PLAYER_DATA_FOLDER =
             Path.of("data", "player");
 
-    private final ConcurrentHashMap<UUID, PlayerData> activePlayerData;
+    private final ConcurrentHashMap<UUID, ActivePlayerData> activePlayerData;
+
     private final Gson gson;
 
     public PlayerDataManager() {
@@ -32,21 +33,20 @@ public class PlayerDataManager {
 
     public void registerPlayer(UUID playerId) {
         PlayerData playerData = loadPlayerData(playerId);
-        activePlayerData.put(playerId, playerData);
+        activePlayerData.put(playerId, new ActivePlayerData(playerData));
     }
 
     public void unregisterPlayer(UUID playerId) {
-        PlayerData playerData = activePlayerData.remove(playerId);
+        ActivePlayerData playerData = activePlayerData.remove(playerId);
 
-        if (playerData == null) {
+        if (playerData.playerData == null) {
             Main.getLogger().warn(
                     "Tried to save player {}, but they were not registered",
                     playerId
             );
             return;
         }
-
-        savePlayerData(playerData);
+        savePlayerData(playerData.playerData);
     }
 
     private PlayerData loadPlayerData(UUID playerId) {
@@ -119,7 +119,7 @@ public class PlayerDataManager {
         return PLAYER_DATA_FOLDER.resolve(playerId + ".json");
     }
 
-    public PlayerData getPlayerData(UUID playerId) {
+    public ActivePlayerData getPlayerData(UUID playerId) {
         return activePlayerData.get(playerId);
     }
 }

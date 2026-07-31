@@ -1,4 +1,4 @@
-package dev.speedslicer.server.bootstrap.data.entity;
+package dev.speedslicer.server.data.entity;
 
 import com.google.gson.JsonElement;
 import dev.speedslicer.api.entity.ai.TemplateEntityAI;

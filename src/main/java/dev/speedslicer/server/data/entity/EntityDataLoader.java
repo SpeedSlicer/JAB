@@ -1,4 +1,4 @@
-package dev.speedslicer.server.bootstrap.data.entity;
+package dev.speedslicer.server.data.entity;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

@@ -4,6 +4,7 @@ import dev.speedslicer.api.APIVersion;
 import dev.speedslicer.api.item.data.ItemData;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class PlayerData {
     private final int version;
@@ -11,8 +12,8 @@ public class PlayerData {
     private final HashMap<String, Integer> items;
     private final HashMap<String, Integer> armors;
     private final HashMap<String, Integer> charms;
-    private final int coins;
-    private final long lvl;
+    private int coins;
+    private long lvl;
     private Map<PlayerSlot, String> selectedItems;
     private boolean completedTutorial;
 
@@ -58,6 +59,9 @@ public class PlayerData {
         addItem(itemData.id(), amount);
     }
 
+    public void addCoins(int amount) {
+        coins += amount;
+    }
     public void addItem(ItemData itemData) {
         addItem(itemData, 1);
     }
@@ -99,5 +103,9 @@ public class PlayerData {
 
     public int getVersion() {
         return version;
+    }
+
+    public Map<PlayerSlot, String> getSelectedItems() {
+        return selectedItems;
     }
 }

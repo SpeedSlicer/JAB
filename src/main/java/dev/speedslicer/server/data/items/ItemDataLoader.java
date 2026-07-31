@@ -1,11 +1,9 @@
-package dev.speedslicer.server.bootstrap.data.items;
+package dev.speedslicer.server.data.items;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dev.speedslicer.api.APIVersion;
 import dev.speedslicer.api.item.ItemCategories;
 import dev.speedslicer.api.item.data.ItemData;
-import dev.speedslicer.server.ServerSettings;
 import dev.speedslicer.server.main.Main;
 import dev.speedslicer.server.main.ServerController;
 
@@ -13,7 +11,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Stream;
 
 public final class ItemDataLoader {
     private final Gson gson = new GsonBuilder()

@@ -143,6 +143,7 @@ public final class ItemStackConstructor {
         return switch (boostType) {
             case DAMAGE -> NamedTextColor.RED;
             case HEALTH -> NamedTextColor.GREEN;
+            case RANGE -> NamedTextColor.YELLOW;
         };
     }
 

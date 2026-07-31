@@ -1,0 +1,15 @@
+{
+  "version": 3,
+  "uuid": "ebc9add4-cf71-3481-b0d9-efb74f74bc7c",
+  "items": {
+    "weapon:basic_sword": 1
+  },
+  "armors": {},
+  "charms": {},
+  "coins": 0,
+  "lvl": 0,
+  "selectedItems": {
+    "HAND": "weapon:basic_sword"
+  },
+  "completedTutorial": true
+}

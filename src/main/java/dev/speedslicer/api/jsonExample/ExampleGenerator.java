@@ -14,6 +14,8 @@ import dev.speedslicer.api.item.data.attribute.BoostType;
 import dev.speedslicer.api.item.data.attribute.ItemBoost;
 import dev.speedslicer.api.item.data.tag.ItemTagData;
 import dev.speedslicer.api.item.data.tag.ItemTagType;
+import dev.speedslicer.api.lootable.LootTableData;
+import dev.speedslicer.api.lootable.LootTableItemData;
 import dev.speedslicer.api.player.PlayerData;
 import dev.speedslicer.server.main.Main;
 
@@ -27,6 +29,7 @@ public class ExampleGenerator {
     PlayerData playerDataExample;
     ItemData itemDataExample;
     EntityData entityDataExample;
+    LootTableData lootTableDataExample;
     Gson gson;
     public ExampleGenerator() {
         playerDataExample = new PlayerData(UUID.randomUUID());
@@ -36,7 +39,7 @@ public class ExampleGenerator {
         entityDataExample = new EntityData(
                 1,
                 "john",
-                "&6John",
+                "John",
                 "minecraft:villager",
                 List.of(
                         new EntityAIData(
@@ -66,7 +69,7 @@ public class ExampleGenerator {
         itemDataExample = new ItemData(
                 3,
                 "example",
-                "registry",
+                "weapon",
                 "Example Thing",
                 List.of("Example thing"),
                 "minecraft:iron_sword",
@@ -110,6 +113,12 @@ public class ExampleGenerator {
                                 List.of("jab")
                         )
                 ));
+
+        var lt = new HashMap<String, LootTableItemData>();
+        lt.put("weapon:basic_sword", new LootTableItemData(0.23, 1));
+        lootTableDataExample = new LootTableData(
+            "example_loot_table", lt
+        );
         gson = new GsonBuilder().setPrettyPrinting().create();
     }
     public void generateExamples() {
@@ -117,7 +126,7 @@ public class ExampleGenerator {
             generateExample(playerDataExample, "playerDataExample");
             generateExample(itemDataExample, "itemDataExample");
             generateExample(entityDataExample, "entityDataExample");
-
+            generateExample(lootTableDataExample, "lootTableDataExample");
         }
         catch (Exception e) {
             Main.getLogger().error("One or more of the data failed construct!");

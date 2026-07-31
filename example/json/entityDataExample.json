@@ -1,21 +1,21 @@
 {
   "version": 1,
   "id": "john",
-  "nametag": "\u00266John",
+  "nametag": "John",
   "baseEntity": "minecraft:villager",
   "associatedAI": [
     {
       "id": "aggressive_attack_player",
       "data": {
-        "targetRange": 10.0,
         "attackDelayMillis": 2000,
+        "targetRange": 10.0,
         "attackRange": 4.0
       }
     }
   ],
   "metadata": {
-    "customNameVisible": true,
-    "glowing": true
+    "glowing": true,
+    "customNameVisible": true
   },
   "equipment": {
     "mainHand": "weapon:basic_sword"

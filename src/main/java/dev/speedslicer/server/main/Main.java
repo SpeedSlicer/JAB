@@ -13,16 +13,19 @@ public class Main {
             LoggerFactory.getLogger(Main.class);
     public static ServerController instance;
     public static ExampleGenerator exampleGenerator;
-    static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
         exampleGenerator = new ExampleGenerator();
         LOGGER.info("START");
         LOGGER.info("Generating Examples");
         exampleGenerator.generateExamples();
         LOGGER.info("Initializing Server");
-        ServerController instance = new ServerController();
+        instance = new ServerController();
     }
 
     public static Logger getLogger() {
         return LOGGER;
+    }
+    public static ServerController getServerController() {
+        return instance;
     }
 }
