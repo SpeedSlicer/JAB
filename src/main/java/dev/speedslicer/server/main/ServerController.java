@@ -2,6 +2,7 @@ package dev.speedslicer.server.main;
 
 import dev.speedslicer.api.player.PlayerData;
 import dev.speedslicer.api.player.PlayerSlot;
+import dev.speedslicer.server.commands.move.MovePlayerServer;
 import dev.speedslicer.server.data.entity.EntityAIDataLoader;
 import dev.speedslicer.server.data.entity.EntityDataLoader;
 import dev.speedslicer.server.data.items.ItemDataLoader;
@@ -23,7 +24,6 @@ import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.AsyncPlayerPreLoginEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
-import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.player.GameProfile;
@@ -43,7 +43,6 @@ public class ServerController {
 
     PlayerDataManager playerDataManager;
     LobbyInstanceManager lobbyInstanceManager;
-    InstanceContainer routeInstanceContainer;
 
     public ServerController() throws IOException {
         itemRegistry = new ItemRegistry();
@@ -62,28 +61,25 @@ public class ServerController {
         MinecraftServer minecraftServer = MinecraftServer.init();
         lobbyInstanceManager = new LobbyInstanceManager(this);
 
-        routeInstanceContainer = MinecraftServer.getInstanceManager().createInstanceContainer();
         SetupGlobalPackets();
+
+        // Commands
+        MinecraftServer.getCommandManager().register(new MovePlayerServer(lobbyInstanceManager));
+
         minecraftServer.start("0.0.0.0", 25565);
     }
 
     public void SetupGlobalPackets() {
-
-        routeInstanceContainer.eventNode().addListener(PlayerSpawnEvent.class, event -> {
-           event.getPlayer().setInstance(lobbyInstanceManager.getAvailableLobby());
-        });
-
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             final Player player = event.getPlayer();
             Main.getLogger().info("Player " + player.getUsername() + " connected with UUID " + player.getUuid());
-            event.setSpawningInstance(routeInstanceContainer);
             player.setRespawnPoint(new Pos(0, 42, 0));
             playerDataManager.registerPlayer(player.getUuid());
+            event.setSpawningInstance(lobbyInstanceManager.getAvailableLobby());
         });
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
             final Player player = event.getPlayer();
-            // TODO Replace this block
             ActivePlayerData data = playerDataManager.getPlayerData(player.getUuid());
             if (!data.getPlayerData().hasCompletedTutorial()) { // TODO replace with an actual tutorial
                 Notification notification = new Notification(
@@ -105,11 +101,9 @@ public class ServerController {
             playerDataManager.unregisterPlayer(player.getUuid());
         });
         globalEventHandler.addListener(AsyncPlayerPreLoginEvent.class, event -> {
-            String username = event.getUsername();
-
+            String username = event.getGameProfile().name();
             byte[] bytes = ("OfflinePlayer:" + username).getBytes(StandardCharsets.UTF_8);
             UUID offlineUuid = UUID.nameUUIDFromBytes(bytes);
-
             event.setGameProfile(new GameProfile(offlineUuid, username));
         });
     }

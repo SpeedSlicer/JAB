@@ -7,9 +7,9 @@
     {
       "id": "aggressive_attack_player",
       "data": {
+        "attackRange": 4.0,
         "attackDelayMillis": 2000,
-        "targetRange": 10.0,
-        "attackRange": 4.0
+        "targetRange": 10.0
       }
     }
   ],

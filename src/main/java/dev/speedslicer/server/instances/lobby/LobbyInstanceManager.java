@@ -57,7 +57,6 @@ public class LobbyInstanceManager {
     }
     private SharedInstance constructLobbyNode () {
         SharedInstance construct = instanceManager.createSharedInstance(baseLobbyContainer);
-        instanceManager.registerSharedInstance(construct);
         construct.eventNode().addListener(PlayerSpawnEvent.class, event -> {
             final Player player = event.getPlayer();
             ActivePlayerData playerData = controller.getPlayerDataManager().getPlayerData(player.getUuid());
@@ -100,5 +99,8 @@ public class LobbyInstanceManager {
 
     public void movePlayerToLobby(Player player) {
         player.setInstance(getAvailableLobby());
+    }
+    public void movePlayerToLobby(Player player, int lobbyNumber) {
+        player.setInstance(lobbyInstances.get(lobbyNumber));
     }
 }
