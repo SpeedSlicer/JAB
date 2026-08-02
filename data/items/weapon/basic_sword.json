@@ -4,7 +4,8 @@
   "id": "basic_sword",
   "name": "Basic Sword",
   "description": [
-    "Quite a basic sword. Still, elegant tho"
+    "Quite a basic sword",
+    "Elegant, though"
   ],
   "material": "minecraft:stone_sword",
   "amount": 1,

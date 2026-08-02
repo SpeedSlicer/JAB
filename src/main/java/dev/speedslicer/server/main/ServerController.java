@@ -1,5 +1,7 @@
 package dev.speedslicer.server.main;
 
+import com.jodexindustries.jguiwrapper.api.GuiApi;
+import com.jodexindustries.jguiwrapper.minestom.MinestomGuiApi;
 import dev.speedslicer.api.player.PlayerData;
 import dev.speedslicer.api.player.PlayerSlot;
 import dev.speedslicer.server.commands.move.MovePlayerServer;
@@ -59,14 +61,15 @@ public class ServerController {
         entityDataLoader.bootstrapLoad(this);
         entityAIDataLoader.bootstrapLoad(this);
         MinecraftServer minecraftServer = MinecraftServer.init();
+        minecraftServer.start("0.0.0.0", 25565);
         lobbyInstanceManager = new LobbyInstanceManager(this);
+        MinestomGuiApi.init(MinecraftServer.process());
 
         SetupGlobalPackets();
 
         // Commands
         MinecraftServer.getCommandManager().register(new MovePlayerServer(lobbyInstanceManager));
 
-        minecraftServer.start("0.0.0.0", 25565);
     }
 
     public void SetupGlobalPackets() {
@@ -119,4 +122,7 @@ public class ServerController {
         return entityAIRegistry;
     }
     public PlayerDataManager getPlayerDataManager() {return playerDataManager;}
+    public GuiApi getGUIApi() {
+        return GuiApi.get();
+    }
 }

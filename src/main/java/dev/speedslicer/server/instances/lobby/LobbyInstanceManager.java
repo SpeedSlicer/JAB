@@ -1,9 +1,18 @@
 package dev.speedslicer.server.instances.lobby;
 
+import com.jodexindustries.jguiwrapper.api.gui.factory.GuiOptions;
+import com.jodexindustries.jguiwrapper.api.gui.factory.GuiType;
+import com.jodexindustries.jguiwrapper.minestom.MinestomGuiApi;
+import com.jodexindustries.jguiwrapper.minestom.gui.types.advanced.MinestomAdvancedGui;
 import dev.speedslicer.api.item.utils.ItemStackConstructor;
+import dev.speedslicer.api.player.PlayerSlot;
 import dev.speedslicer.server.data.playerdata.ActivePlayerData;
 import dev.speedslicer.server.main.ServerController;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.advancements.FrameType;
+import net.minestom.server.advancements.Notification;
 import net.minestom.server.coordinate.Area;
 import net.minestom.server.coordinate.ChunkRange;
 import net.minestom.server.coordinate.Pos;
@@ -16,7 +25,8 @@ import net.minestom.server.event.item.ItemDropEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.*;
 import net.minestom.server.instance.block.Block;
-
+import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.Material;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -60,6 +70,22 @@ public class LobbyInstanceManager {
         construct.eventNode().addListener(PlayerSpawnEvent.class, event -> {
             final Player player = event.getPlayer();
             ActivePlayerData playerData = controller.getPlayerDataManager().getPlayerData(player.getUuid());
+
+            if (!playerData.getPlayerData().hasCompletedTutorial()) { // TODO replace with an actual tutorial
+                Notification notification = new Notification(
+                        Component.text("Welcome to JAB!", NamedTextColor.GREEN),
+                        FrameType.GOAL,
+                        ItemStack.of(Material.GOLD_INGOT)
+                );
+
+                playerData.addItem("weapon:basic_sword");
+                playerData.setSlot(PlayerSlot.HAND, "weapon:basic_sword");
+
+                player.sendNotification(notification);
+                playerData.getPlayerData().completeTutorial();
+            }
+
+            // starting item thing
             player.getInventory().clear();
 
             var item = ItemStackConstructor.constructItemFromData(
@@ -68,6 +94,7 @@ public class LobbyInstanceManager {
             player.setHeldItemSlot((byte) 0);
             player.setGameMode(GameMode.ADVENTURE);
         });
+
         construct.eventNode().addListener(ItemDropEvent.class, event -> {
             event.setCancelled(true);
         });

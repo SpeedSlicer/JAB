@@ -24,26 +24,17 @@
     }
   ],
   "components": {
-    "minecraft:repair_cost": 0,
+    "minecraft:rarity": "rare",
     "minecraft:unbreakable": true,
-    "minecraft:rarity": "rare"
+    "minecraft:repair_cost": 0
   },
   "resetComponents": [],
   "removeComponents": [],
   "tags": {
-    "jab:level": {
-      "type": "INTEGER",
-      "value": 1,
-      "list": false,
-      "path": []
-    },
-    "jab:labels": {
+    "jab:item_id": {
       "type": "STRING",
-      "value": [
-        "example",
-        "generated"
-      ],
-      "list": true,
+      "value": "registry:example",
+      "list": false,
       "path": []
     },
     "payload": {
@@ -57,9 +48,18 @@
         "jab"
       ]
     },
-    "jab:item_id": {
+    "jab:labels": {
       "type": "STRING",
-      "value": "registry:example",
+      "value": [
+        "example",
+        "generated"
+      ],
+      "list": true,
+      "path": []
+    },
+    "jab:level": {
+      "type": "INTEGER",
+      "value": 1,
       "list": false,
       "path": []
     }
