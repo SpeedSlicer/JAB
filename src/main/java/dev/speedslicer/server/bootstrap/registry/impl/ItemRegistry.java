@@ -1,8 +1,9 @@
-package dev.speedslicer.server.bootstrap.registry;
+package dev.speedslicer.server.bootstrap.registry.impl;
 
 import dev.speedslicer.api.APIVersion;
 import dev.speedslicer.api.item.data.ItemData;
 import dev.speedslicer.server.ServerSettings;
+import dev.speedslicer.server.bootstrap.registry.Registry;
 import dev.speedslicer.server.main.Main;
 
 import java.util.HashMap;

@@ -4,9 +4,8 @@ import dev.speedslicer.api.item.data.ItemData;
 import dev.speedslicer.api.item.data.attribute.BoostType;
 import dev.speedslicer.api.item.data.attribute.ItemBoost;
 import dev.speedslicer.api.player.PlayerData;
-import dev.speedslicer.server.bootstrap.registry.ItemRegistry;
+import dev.speedslicer.server.bootstrap.registry.impl.ItemRegistry;
 import dev.speedslicer.server.main.Main;
-import net.minestom.server.entity.Player;
 
 import java.util.HashMap;
 import java.util.UUID;

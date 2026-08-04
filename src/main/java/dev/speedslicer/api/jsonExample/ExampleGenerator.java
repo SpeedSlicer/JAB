@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import dev.speedslicer.api.dungeon.DungeonData;
+import dev.speedslicer.api.dungeon.RoomData;
 import dev.speedslicer.api.entity.EntityData;
 import dev.speedslicer.api.entity.ai.EntityAIData;
 import dev.speedslicer.api.entity.items.EntityEquipmentData;
@@ -18,6 +20,7 @@ import dev.speedslicer.api.lootable.LootTableData;
 import dev.speedslicer.api.lootable.LootTableItemData;
 import dev.speedslicer.api.player.PlayerData;
 import dev.speedslicer.server.main.Main;
+import net.minestom.server.coordinate.Pos;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -30,6 +33,7 @@ public class ExampleGenerator {
     ItemData itemDataExample;
     EntityData entityDataExample;
     LootTableData lootTableDataExample;
+    DungeonData dungeonExampleDataExample;
     Gson gson;
     public ExampleGenerator() {
         playerDataExample = new PlayerData(UUID.randomUUID());
@@ -119,6 +123,26 @@ public class ExampleGenerator {
         lootTableDataExample = new LootTableData(
             "example_loot_table", lt
         );
+        Map<String, Pos> mobs = new HashMap<>();
+        mobs.put("john", new Pos(0,0,0));
+        var roomData = new ArrayList<RoomData>();
+
+        roomData.add(new RoomData(
+                mobs,
+                new Pos(0,10,0),
+                new Pos(10,0,10),
+                List.of(lootTableDataExample, lootTableDataExample)
+        ));
+        dungeonExampleDataExample = new DungeonData(
+                "overworld",
+                "Overworld",
+                "minecraft:grass_block",
+                List.of("john"),
+                lootTableDataExample,
+                Pos.ZERO,
+                roomData
+        );
+
         gson = new GsonBuilder().setPrettyPrinting().create();
     }
     public void generateExamples() {
@@ -127,6 +151,8 @@ public class ExampleGenerator {
             generateExample(itemDataExample, "itemDataExample");
             generateExample(entityDataExample, "entityDataExample");
             generateExample(lootTableDataExample, "lootTableDataExample");
+            generateExample(dungeonExampleDataExample, "dungeonDataExample");
+
         }
         catch (Exception e) {
             Main.getLogger().error("One or more of the data failed construct!");

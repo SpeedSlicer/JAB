@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.speedslicer.api.item.ItemCategories;
 import dev.speedslicer.api.item.data.ItemData;
+import dev.speedslicer.server.data.FileUtil;
 import dev.speedslicer.server.main.Main;
 import dev.speedslicer.server.main.ServerController;
 
@@ -38,7 +39,7 @@ public final class ItemDataLoader {
 
             try (var files = Files.list(lFolder)) {
                 files.filter(Files::isRegularFile)
-                        .filter(path -> path.toString().endsWith(".json"))
+                        .filter(FileUtil::isJsonFile)
                         .forEach(x -> {
                             try {
                                 serverController.getItemRegistry().addItem(gson.fromJson(Files.readString(x), ItemData.class));

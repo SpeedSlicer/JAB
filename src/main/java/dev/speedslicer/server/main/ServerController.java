@@ -2,17 +2,19 @@ package dev.speedslicer.server.main;
 
 import com.jodexindustries.jguiwrapper.api.GuiApi;
 import com.jodexindustries.jguiwrapper.minestom.MinestomGuiApi;
-import dev.speedslicer.api.player.PlayerData;
 import dev.speedslicer.api.player.PlayerSlot;
+import dev.speedslicer.server.bootstrap.registry.impl.DungeonRegistry;
 import dev.speedslicer.server.commands.move.MovePlayerServer;
+import dev.speedslicer.server.data.dungeon.DungeonDataLoader;
 import dev.speedslicer.server.data.entity.EntityAIDataLoader;
 import dev.speedslicer.server.data.entity.EntityDataLoader;
 import dev.speedslicer.server.data.items.ItemDataLoader;
 import dev.speedslicer.server.data.playerdata.ActivePlayerData;
 import dev.speedslicer.server.data.playerdata.PlayerDataManager;
-import dev.speedslicer.server.bootstrap.registry.EntityAIRegistry;
-import dev.speedslicer.server.bootstrap.registry.EntityRegistry;
-import dev.speedslicer.server.bootstrap.registry.ItemRegistry;
+import dev.speedslicer.server.bootstrap.registry.impl.EntityAIRegistry;
+import dev.speedslicer.server.bootstrap.registry.impl.EntityRegistry;
+import dev.speedslicer.server.bootstrap.registry.impl.ItemRegistry;
+import dev.speedslicer.server.instances.dungeon.DungeonInstanceManager;
 import dev.speedslicer.server.instances.lobby.LobbyInstanceManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -38,24 +40,30 @@ public class ServerController {
     ItemDataLoader itemDataLoader;
     EntityDataLoader entityDataLoader;
     EntityAIDataLoader entityAIDataLoader;
+    DungeonDataLoader dungeonDataLoader;
 
     ItemRegistry itemRegistry;
     EntityRegistry entityRegistry;
     EntityAIRegistry entityAIRegistry;
+    DungeonRegistry dungeonRegistry;
 
     PlayerDataManager playerDataManager;
     LobbyInstanceManager lobbyInstanceManager;
 
+    DungeonInstanceManager dungeonInstanceManager;
     public ServerController() throws IOException {
         itemRegistry = new ItemRegistry();
         entityRegistry = new EntityRegistry();
         entityAIRegistry = new EntityAIRegistry();
+        dungeonRegistry = new DungeonRegistry();
 
         itemDataLoader = new ItemDataLoader();
         entityDataLoader = new EntityDataLoader();
         entityAIDataLoader = new EntityAIDataLoader();
 
         playerDataManager = new PlayerDataManager();
+
+        dungeonInstanceManager = new DungeonInstanceManager();
 
         itemDataLoader.bootstrapLoad(this);
         entityDataLoader.bootstrapLoad(this);
@@ -114,13 +122,14 @@ public class ServerController {
     public ItemRegistry getItemRegistry() {
         return itemRegistry;
     }
-
     public EntityRegistry getEntityRegistry() {
         return entityRegistry;
     }
     public EntityAIRegistry getEntityAIRegistry() {
         return entityAIRegistry;
     }
+    public DungeonRegistry getDungeonRegistry() { return dungeonRegistry;}
+
     public PlayerDataManager getPlayerDataManager() {return playerDataManager;}
     public GuiApi getGUIApi() {
         return GuiApi.get();

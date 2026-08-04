@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import dev.speedslicer.api.APIVersion;
 import dev.speedslicer.api.entity.EntityData;
 import dev.speedslicer.server.ServerSettings;
+import dev.speedslicer.server.data.FileUtil;
 import dev.speedslicer.server.main.Main;
 import dev.speedslicer.server.main.ServerController;
 
@@ -30,16 +31,9 @@ public class EntityDataLoader {
         Files.createDirectories(folder);
         try (Stream<Path> paths = Files.walk(folder)) {
             paths.filter(Files::isRegularFile)
-                    .filter(this::isJsonFile)
+                    .filter(FileUtil::isJsonFile)
                     .forEach(path -> loadEntity(path, serverController));
         }
-    }
-
-    private boolean isJsonFile(Path path) {
-        return path.getFileName()
-                .toString()
-                .toLowerCase()
-                .endsWith(".json");
     }
 
     private void loadEntity(
