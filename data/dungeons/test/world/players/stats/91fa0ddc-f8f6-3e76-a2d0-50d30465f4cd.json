@@ -1,0 +1,36 @@
+{
+  "stats": {
+    "minecraft:used": {
+      "minecraft:stripped_spruce_log": 13,
+      "minecraft:spruce_log": 73,
+      "minecraft:stone": 69,
+      "minecraft:glowstone": 2,
+      "minecraft:spruce_stairs": 6,
+      "minecraft:stripped_spruce_wood": 7,
+      "minecraft:sea_lantern": 6
+    },
+    "minecraft:custom": {
+      "minecraft:sprint_one_cm": 210,
+      "minecraft:time_since_rest": 6299,
+      "minecraft:walk_one_cm": 2291,
+      "minecraft:total_world_time": 6481,
+      "minecraft:leave_game": 1,
+      "minecraft:fly_one_cm": 15858,
+      "minecraft:crouch_one_cm": 241,
+      "minecraft:play_time": 6299,
+      "minecraft:sneak_time": 233,
+      "minecraft:jump": 17,
+      "minecraft:time_since_death": 6299,
+      "minecraft:drop": 6
+    },
+    "minecraft:dropped": {
+      "minecraft:glowstone": 1,
+      "minecraft:spruce_log": 64,
+      "minecraft:stripped_spruce_log": 64,
+      "minecraft:stripped_spruce_wood": 64,
+      "minecraft:sea_lantern": 64,
+      "minecraft:spruce_stairs": 1
+    }
+  },
+  "DataVersion": 4903
+}

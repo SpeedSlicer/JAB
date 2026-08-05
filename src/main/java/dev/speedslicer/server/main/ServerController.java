@@ -1,62 +1,61 @@
 package dev.speedslicer.server.main;
 
-import dev.speedslicer.api.entity.utils.EntityDataConstructor;
-import dev.speedslicer.api.item.utils.ItemStackConstructor;
-import dev.speedslicer.api.player.PlayerData;
+import com.jodexindustries.jguiwrapper.api.GuiApi;
+import com.jodexindustries.jguiwrapper.minestom.MinestomGuiApi;
 import dev.speedslicer.api.player.PlayerSlot;
-import dev.speedslicer.server.bootstrap.data.entity.EntityAIDataLoader;
-import dev.speedslicer.server.bootstrap.data.entity.EntityDataLoader;
-import dev.speedslicer.server.bootstrap.data.items.ItemDataLoader;
-import dev.speedslicer.server.bootstrap.data.playerdata.PlayerDataManager;
-import dev.speedslicer.server.bootstrap.registry.EntityAIRegistry;
-import dev.speedslicer.server.bootstrap.registry.EntityRegistry;
-import dev.speedslicer.server.bootstrap.registry.ItemRegistry;
+import dev.speedslicer.server.bootstrap.registry.impl.DungeonRegistry;
+import dev.speedslicer.server.commands.move.MovePlayerServer;
+import dev.speedslicer.server.data.dungeon.DungeonDataLoader;
+import dev.speedslicer.server.data.entity.EntityAIDataLoader;
+import dev.speedslicer.server.data.entity.EntityDataLoader;
+import dev.speedslicer.server.data.items.ItemDataLoader;
+import dev.speedslicer.server.data.playerdata.ActivePlayerData;
+import dev.speedslicer.server.data.playerdata.PlayerDataManager;
+import dev.speedslicer.server.bootstrap.registry.impl.EntityAIRegistry;
+import dev.speedslicer.server.bootstrap.registry.impl.EntityRegistry;
+import dev.speedslicer.server.bootstrap.registry.impl.ItemRegistry;
+import dev.speedslicer.server.instances.dungeon.DungeonInstanceManager;
+import dev.speedslicer.server.instances.lobby.LobbyInstanceManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.advancements.FrameType;
 import net.minestom.server.advancements.Notification;
-import net.minestom.server.coordinate.Area;
-import net.minestom.server.coordinate.ChunkRange;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.EntityCreature;
-import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
-import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.event.GlobalEventHandler;
-import net.minestom.server.event.entity.EntityAttackEvent;
-import net.minestom.server.event.item.ItemDropEvent;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
+import net.minestom.server.event.player.AsyncPlayerPreLoginEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
-import net.minestom.server.instance.Chunk;
-import net.minestom.server.instance.InstanceContainer;
-import net.minestom.server.instance.InstanceManager;
-import net.minestom.server.instance.LightingChunk;
-import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.network.player.GameProfile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 public class ServerController {
     ItemDataLoader itemDataLoader;
     EntityDataLoader entityDataLoader;
     EntityAIDataLoader entityAIDataLoader;
+    DungeonDataLoader dungeonDataLoader;
 
     ItemRegistry itemRegistry;
     EntityRegistry entityRegistry;
     EntityAIRegistry entityAIRegistry;
+    DungeonRegistry dungeonRegistry;
 
-    InstanceContainer instanceContainer; // TODO replac with actual lobby system
     PlayerDataManager playerDataManager;
+    LobbyInstanceManager lobbyInstanceManager;
 
+    DungeonInstanceManager dungeonInstanceManager;
     public ServerController() throws IOException {
         itemRegistry = new ItemRegistry();
         entityRegistry = new EntityRegistry();
         entityAIRegistry = new EntityAIRegistry();
+        dungeonRegistry = new DungeonRegistry();
 
         itemDataLoader = new ItemDataLoader();
         entityDataLoader = new EntityDataLoader();
@@ -64,68 +63,21 @@ public class ServerController {
 
         playerDataManager = new PlayerDataManager();
 
+        dungeonInstanceManager = new DungeonInstanceManager();
+
         itemDataLoader.bootstrapLoad(this);
         entityDataLoader.bootstrapLoad(this);
         entityAIDataLoader.bootstrapLoad(this);
         MinecraftServer minecraftServer = MinecraftServer.init();
-        SetupLobby();
-        SetupGlobalPackets();
         minecraftServer.start("0.0.0.0", 25565);
-    }
+        lobbyInstanceManager = new LobbyInstanceManager(this);
+        MinestomGuiApi.init(MinecraftServer.process());
 
-    public void SetupLobby() {
-        InstanceManager instanceManager = MinecraftServer.getInstanceManager();
-        instanceContainer = instanceManager.createInstanceContainer();
+        SetupGlobalPackets();
 
-        instanceContainer.setChunkSupplier(LightingChunk::new);
+        // Commands
+        MinecraftServer.getCommandManager().register(new MovePlayerServer(lobbyInstanceManager));
 
-        var chunks = new ArrayList<CompletableFuture<Chunk>>();
-
-        ChunkRange.chunksInRange(0, 0, 2, (x, z) ->
-                chunks.add(instanceContainer.loadChunk(x, z))
-        );
-
-        CompletableFuture.allOf(
-                chunks.toArray(CompletableFuture[]::new)
-        ).join();
-
-        instanceContainer.setBlockArea(
-                Area.cube(new Pos(0, 30, 0), 5),
-                Block.STONE
-        );
-
-        LightingChunk.relight(
-                instanceContainer,
-                instanceContainer.getChunks()
-        );
-        instanceContainer.eventNode().addListener(PlayerSpawnEvent.class, event -> {
-            final Player player = event.getPlayer();
-            PlayerData playerData = playerDataManager.getPlayerData(player.getUuid());
-            player.getInventory().clear();
-
-            var item = ItemStackConstructor.constructItemFromData(
-                  getItemRegistry().getItem(playerData.getHandItem()));
-            player.getInventory().setItemStack(0, item);
-            player.setHeldItemSlot((byte) 0);
-        });
-        instanceContainer.eventNode().addListener(ItemDropEvent.class, event -> {
-            event.setCancelled(true);
-        });
-        instanceContainer.eventNode().addListener(EntityAttackEvent.class, event -> {
-            if (event.getTarget() instanceof LivingEntity target) {
-                target.damage(Damage.fromEntity(event.getEntity(), 4));
-            }
-        });
-
-        Main.getLogger().info("Lobby loaded and lighting calculated");
-
-        Pos spawnPosition = new Pos(0D, 42D, 0D);
-        EntityCreature john = EntityDataConstructor.generateEntityCreatureFromData(
-                entityRegistry.get("john"),
-                entityAIRegistry,
-                itemRegistry
-       );
-        john.setInstance(instanceContainer, spawnPosition);
     }
 
     public void SetupGlobalPackets() {
@@ -133,15 +85,14 @@ public class ServerController {
         globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
             final Player player = event.getPlayer();
             Main.getLogger().info("Player " + player.getUsername() + " connected with UUID " + player.getUuid());
-            event.setSpawningInstance(instanceContainer);
             player.setRespawnPoint(new Pos(0, 42, 0));
             playerDataManager.registerPlayer(player.getUuid());
+            event.setSpawningInstance(lobbyInstanceManager.getAvailableLobby());
         });
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
             final Player player = event.getPlayer();
-            // TODO Replace this block
-            PlayerData data = playerDataManager.getPlayerData(player.getUuid());
-            if (!data.hasCompletedTutorial()) { // TODO replace with an actual tutorial
+            ActivePlayerData data = playerDataManager.getPlayerData(player.getUuid());
+            if (!data.getPlayerData().hasCompletedTutorial()) { // TODO replace with an actual tutorial
                 Notification notification = new Notification(
                         Component.text("Welcome to JAB!", NamedTextColor.GREEN),
                         FrameType.GOAL,
@@ -152,7 +103,7 @@ public class ServerController {
                 data.setSlot(PlayerSlot.HAND, "weapon:basic_sword");
 
                 player.sendNotification(notification);
-                data.completeTutorial();
+                data.getPlayerData().completeTutorial();
             }
         });
         globalEventHandler.addListener(PlayerDisconnectEvent.class, event -> {
@@ -160,17 +111,27 @@ public class ServerController {
             Main.getLogger().info("Player {} disconnected with UUID {}", player.getUsername(), player.getUuid());
             playerDataManager.unregisterPlayer(player.getUuid());
         });
-
+        globalEventHandler.addListener(AsyncPlayerPreLoginEvent.class, event -> {
+            String username = event.getGameProfile().name();
+            byte[] bytes = ("OfflinePlayer:" + username).getBytes(StandardCharsets.UTF_8);
+            UUID offlineUuid = UUID.nameUUIDFromBytes(bytes);
+            event.setGameProfile(new GameProfile(offlineUuid, username));
+        });
     }
 
     public ItemRegistry getItemRegistry() {
         return itemRegistry;
     }
-
     public EntityRegistry getEntityRegistry() {
         return entityRegistry;
     }
     public EntityAIRegistry getEntityAIRegistry() {
         return entityAIRegistry;
+    }
+    public DungeonRegistry getDungeonRegistry() { return dungeonRegistry;}
+
+    public PlayerDataManager getPlayerDataManager() {return playerDataManager;}
+    public GuiApi getGUIApi() {
+        return GuiApi.get();
     }
 }

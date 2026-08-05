@@ -1,0 +1,9 @@
+{
+  "id": "example_loot_table",
+  "rewards": {
+    "weapon:basic_sword": {
+      "chance": 0.23,
+      "amount": 1
+    }
+  }
+}

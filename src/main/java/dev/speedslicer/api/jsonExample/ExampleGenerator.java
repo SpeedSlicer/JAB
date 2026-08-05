@@ -5,17 +5,25 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import dev.speedslicer.api.APIVersion;
+import dev.speedslicer.api.dungeon.DungeonData;
+import dev.speedslicer.api.dungeon.RoomData;
 import dev.speedslicer.api.entity.EntityData;
 import dev.speedslicer.api.entity.ai.EntityAIData;
 import dev.speedslicer.api.entity.items.EntityEquipmentData;
+import dev.speedslicer.api.entity.stats.EntityStatType;
+import dev.speedslicer.api.entity.stats.EntityStats;
 import dev.speedslicer.api.item.data.ItemData;
 import dev.speedslicer.api.item.data.ItemDisplayOptions;
 import dev.speedslicer.api.item.data.attribute.BoostType;
 import dev.speedslicer.api.item.data.attribute.ItemBoost;
 import dev.speedslicer.api.item.data.tag.ItemTagData;
 import dev.speedslicer.api.item.data.tag.ItemTagType;
+import dev.speedslicer.api.lootable.LootTableData;
+import dev.speedslicer.api.lootable.LootTableItemData;
 import dev.speedslicer.api.player.PlayerData;
 import dev.speedslicer.server.main.Main;
+import net.minestom.server.coordinate.Pos;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -27,16 +35,20 @@ public class ExampleGenerator {
     PlayerData playerDataExample;
     ItemData itemDataExample;
     EntityData entityDataExample;
+    LootTableData lootTableDataExample;
+    DungeonData dungeonExampleDataExample;
     Gson gson;
     public ExampleGenerator() {
         playerDataExample = new PlayerData(UUID.randomUUID());
         Map<String, JsonElement> x = new HashMap<>();
         x.put("glowing", new JsonPrimitive(true));
         x.put("customNameVisible", new JsonPrimitive(true));
+        Map<EntityStatType, Double> stats = new HashMap<>();
+        stats.put(EntityStatType.DAMAGE, 2.0);
         entityDataExample = new EntityData(
-                1,
+                APIVersion.entityDataVersion,
                 "john",
-                "&6John",
+                "John",
                 "minecraft:villager",
                 List.of(
                         new EntityAIData(
@@ -61,12 +73,15 @@ public class ExampleGenerator {
                         null,
                         null,
                         null
+                ),
+                new EntityStats(
+                    stats
                 )
         );
         itemDataExample = new ItemData(
-                3,
+                APIVersion.itemDataVersion,
                 "example",
-                "registry",
+                "weapon",
                 "Example Thing",
                 List.of("Example thing"),
                 "minecraft:iron_sword",
@@ -110,6 +125,33 @@ public class ExampleGenerator {
                                 List.of("jab")
                         )
                 ));
+
+        var lt = new HashMap<String, LootTableItemData>();
+        lt.put("weapon:basic_sword", new LootTableItemData(0.23, 1));
+        lootTableDataExample = new LootTableData(
+            "example_loot_table", lt
+        );
+        Map<String, Pos> mobs = new HashMap<>();
+        mobs.put("john", new Pos(0,0,0));
+        var roomData = new ArrayList<RoomData>();
+
+        roomData.add(new RoomData(
+                mobs,
+                new Pos(0,10,0),
+                new Pos(10,0,10),
+                List.of(lootTableDataExample, lootTableDataExample)
+        ));
+        dungeonExampleDataExample = new DungeonData(
+                APIVersion.dungeonDataVersion,
+                "overworld",
+                "Overworld",
+                "minecraft:grass_block",
+                List.of("john"),
+                lootTableDataExample,
+                Pos.ZERO,
+                roomData
+        );
+
         gson = new GsonBuilder().setPrettyPrinting().create();
     }
     public void generateExamples() {
@@ -117,6 +159,8 @@ public class ExampleGenerator {
             generateExample(playerDataExample, "playerDataExample");
             generateExample(itemDataExample, "itemDataExample");
             generateExample(entityDataExample, "entityDataExample");
+            generateExample(lootTableDataExample, "lootTableDataExample");
+            generateExample(dungeonExampleDataExample, "dungeonDataExample");
 
         }
         catch (Exception e) {

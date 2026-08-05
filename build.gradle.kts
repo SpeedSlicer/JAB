@@ -9,6 +9,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -16,7 +17,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.13.2")
     implementation("ch.qos.logback:logback-classic:1.5.18")
     implementation("org.xerial:sqlite-jdbc:3.53.2.0") // unneeded but for a future modification
-
+    implementation("com.github.Jodexx.JGuiWrapper:minestom:v1.0.0.9")
     testImplementation(platform("org.junit:junit-bom:5.12.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

@@ -1,0 +1,72 @@
+{
+  "version": 0,
+  "id": "overworld",
+  "name": "Overworld",
+  "material": "minecraft:grass_block",
+  "mobs": [
+    "john"
+  ],
+  "completeLootTable": {
+    "id": "example_loot_table",
+    "rewards": {
+      "weapon:basic_sword": {
+        "chance": 0.23,
+        "amount": 1
+      }
+    }
+  },
+  "spawn": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0,
+    "yaw": 0.0,
+    "pitch": 0.0
+  },
+  "rooms": [
+    {
+      "mobs": {
+        "john": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "yaw": 0.0,
+          "pitch": 0.0
+        }
+      },
+      "exitDoorA": {
+        "x": 0.0,
+        "y": 10.0,
+        "z": 0.0,
+        "yaw": 0.0,
+        "pitch": 0.0
+      },
+      "exitDoorB": {
+        "x": 10.0,
+        "y": 0.0,
+        "z": 10.0,
+        "yaw": 0.0,
+        "pitch": 0.0
+      },
+      "completionLootTable": [
+        {
+          "id": "example_loot_table",
+          "rewards": {
+            "weapon:basic_sword": {
+              "chance": 0.23,
+              "amount": 1
+            }
+          }
+        },
+        {
+          "id": "example_loot_table",
+          "rewards": {
+            "weapon:basic_sword": {
+              "chance": 0.23,
+              "amount": 1
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

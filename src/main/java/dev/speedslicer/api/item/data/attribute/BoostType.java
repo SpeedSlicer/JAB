@@ -2,5 +2,7 @@ package dev.speedslicer.api.item.data.attribute;
 
 public enum BoostType {
     DAMAGE,
-    HEALTH
+    HEALTH,
+    RANGE,
+    CRIT
 }
