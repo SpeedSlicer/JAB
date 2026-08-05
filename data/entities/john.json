@@ -19,5 +19,10 @@
   },
   "equipment": {
     "mainHand": "weapon:basic_sword"
+  },
+  "entityStatistics": {
+    "stats": {
+      "DAMAGE": 2.0
+    }
   }
 }

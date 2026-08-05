@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "id": "john",
   "nametag": "John",
   "baseEntity": "minecraft:villager",
@@ -7,9 +7,9 @@
     {
       "id": "aggressive_attack_player",
       "data": {
-        "targetRange": 10.0,
+        "attackRange": 4.0,
         "attackDelayMillis": 2000,
-        "attackRange": 4.0
+        "targetRange": 10.0
       }
     }
   ],
@@ -19,5 +19,10 @@
   },
   "equipment": {
     "mainHand": "weapon:basic_sword"
+  },
+  "entityStatistics": {
+    "stats": {
+      "DAMAGE": 2.0
+    }
   }
 }

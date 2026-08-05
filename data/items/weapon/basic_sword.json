@@ -22,6 +22,10 @@
     {
       "boostType": "DAMAGE",
       "amount": 1
+    },
+    {
+      "boostType": "CRIT",
+      "amount": 0.2
     }
   ],
   "components": {

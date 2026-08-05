@@ -2,6 +2,7 @@ package dev.speedslicer.api.player;
 
 import dev.speedslicer.api.APIVersion;
 import dev.speedslicer.api.item.data.ItemData;
+import dev.speedslicer.api.permissions.PermGroup;
 
 import java.util.*;
 import java.util.function.Function;
@@ -16,9 +17,10 @@ public class PlayerData {
     private long lvl;
     private Map<PlayerSlot, String> selectedItems;
     private boolean completedTutorial;
+    List<String> permGroups;
 
     public PlayerData(UUID uuid) {
-        this(uuid, 0, new HashMap<String, Integer> (), new HashMap<String, Integer> (), new HashMap<String, Integer> (), new HashMap<>(), 0, false);
+        this(uuid, 0, new HashMap<String, Integer> (), new HashMap<String, Integer> (), new HashMap<String, Integer> (), new HashMap<>(), 0, false, List.of("User"));
     }
 
     public PlayerData(
@@ -29,7 +31,8 @@ public class PlayerData {
             HashMap<String, Integer>  charms,
             Map<PlayerSlot, String>  selectedItems,
             long lvl,
-            boolean completedTutorial
+            boolean completedTutorial,
+            List<String> permissionGroups
     ) {
         this.version = APIVersion.playerDataVersion;
         this.uuid = uuid;
@@ -40,6 +43,7 @@ public class PlayerData {
         this.selectedItems = selectedItems;
         this.lvl = lvl;
         this.completedTutorial = completedTutorial;
+        this.permGroups = permissionGroups;
     }
 
     public void addItem(String itemData, int amount) {
@@ -107,5 +111,15 @@ public class PlayerData {
 
     public Map<PlayerSlot, String> getSelectedItems() {
         return selectedItems;
+    }
+
+    public void addGroup(String permGroup) {
+        permGroups.add(permGroup);
+    }
+    public void removeGroup(String permGroup) {
+        permGroups.remove(permGroup);
+    }
+    public boolean hasGroup(String permGroup) {
+        return permGroups.contains(permGroup);
     }
 }

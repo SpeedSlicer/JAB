@@ -5,11 +5,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import dev.speedslicer.api.APIVersion;
 import dev.speedslicer.api.dungeon.DungeonData;
 import dev.speedslicer.api.dungeon.RoomData;
 import dev.speedslicer.api.entity.EntityData;
 import dev.speedslicer.api.entity.ai.EntityAIData;
 import dev.speedslicer.api.entity.items.EntityEquipmentData;
+import dev.speedslicer.api.entity.stats.EntityStatType;
+import dev.speedslicer.api.entity.stats.EntityStats;
 import dev.speedslicer.api.item.data.ItemData;
 import dev.speedslicer.api.item.data.ItemDisplayOptions;
 import dev.speedslicer.api.item.data.attribute.BoostType;
@@ -40,8 +43,10 @@ public class ExampleGenerator {
         Map<String, JsonElement> x = new HashMap<>();
         x.put("glowing", new JsonPrimitive(true));
         x.put("customNameVisible", new JsonPrimitive(true));
+        Map<EntityStatType, Double> stats = new HashMap<>();
+        stats.put(EntityStatType.DAMAGE, 2.0);
         entityDataExample = new EntityData(
-                1,
+                APIVersion.entityDataVersion,
                 "john",
                 "John",
                 "minecraft:villager",
@@ -68,10 +73,13 @@ public class ExampleGenerator {
                         null,
                         null,
                         null
+                ),
+                new EntityStats(
+                    stats
                 )
         );
         itemDataExample = new ItemData(
-                3,
+                APIVersion.itemDataVersion,
                 "example",
                 "weapon",
                 "Example Thing",
@@ -134,6 +142,7 @@ public class ExampleGenerator {
                 List.of(lootTableDataExample, lootTableDataExample)
         ));
         dungeonExampleDataExample = new DungeonData(
+                APIVersion.dungeonDataVersion,
                 "overworld",
                 "Overworld",
                 "minecraft:grass_block",

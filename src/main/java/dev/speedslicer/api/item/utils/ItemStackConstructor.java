@@ -144,6 +144,7 @@ public final class ItemStackConstructor {
             case DAMAGE -> NamedTextColor.RED;
             case HEALTH -> NamedTextColor.GREEN;
             case RANGE -> NamedTextColor.YELLOW;
+            case CRIT -> NamedTextColor.AQUA;
         };
     }
 
